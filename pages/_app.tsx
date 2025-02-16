@@ -1,6 +1,11 @@
+import { atkinsonHyperlegible } from "@/lib/font";
 import "@/styles/globals.css";
 import type { AppProps } from "next/app";
 
 export default function App({ Component, pageProps }: AppProps) {
-  return <Component {...pageProps} />;
+  return (
+    <div className={`${atkinsonHyperlegible.className}`}>
+      <Component {...pageProps} />
+    </div>
+  );
 }
