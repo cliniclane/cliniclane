@@ -49,7 +49,7 @@ const ResumeForm = () => {
       <h2 className="text-2xl font-semibold text-center mb-6">
         Submit Your Resume
       </h2>
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+      <div className="grid grid-cols-1 md:grid-cols-4 gap-4 items-baseline">
         {/* Text Inputs with Labels */}
         {[
           {
@@ -84,7 +84,7 @@ const ResumeForm = () => {
           },
         ].map((field, index) => (
           <div key={index}>
-            <label className="input-label">{field.label}</label>
+            <label className="input-label text-sm">{field.label}</label>
             <input
               type={field.type}
               name={field.name}
@@ -128,6 +128,11 @@ const ResumeForm = () => {
         {/* Text Inputs with Labels */}
         {[
           {
+            label: "What are your weaknesses?",
+            name: "weaknesses",
+            placeholder: "Your weaknesses?",
+          },
+          {
             label: "If you were an animal, which would you be?",
             name: "animalChoice",
             placeholder: "Animal which matches your personality",
@@ -142,11 +147,7 @@ const ResumeForm = () => {
             name: "rightCandidate",
             placeholder: "Explain?",
           },
-          {
-            label: "What are your weaknesses?",
-            name: "weaknesses",
-            placeholder: "Your weaknesses?",
-          },
+
           {
             label: "What can you do for us that others can't?",
             name: "uniqueSkill",
@@ -158,13 +159,13 @@ const ResumeForm = () => {
             placeholder: "Describe your resume",
           },
         ].map((field, index) => (
-          <div key={index}>
+          <div key={index} className="flex flex-col items-baseline">
             <label className="input-label">{field.label}</label>
-            <textarea
+            <input
               name={field.name}
               placeholder={field.placeholder}
               onChange={handleChange}
-              className="input-field textarea"
+              className="input-field"
             />
           </div>
         ))}

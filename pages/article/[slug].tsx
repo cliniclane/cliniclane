@@ -181,6 +181,14 @@ const Article = () => {
         </div>
         {/* Body */}
         <div className="grid grid-cols-1 md:grid-cols-3 md:gap-32 mt-16">
+          {/* Feed */}
+          <div className="col-span-2 flex flex-col leading-8">
+            {mdxContent ? (
+              <MDXRenderer source={mdxContent} />
+            ) : (
+              <p>Loading MDX...</p>
+            )}
+          </div>
           {/* Guide Points */}
           <div className="flex flex-col w-full mt-10">
             <ul className="w-full">
@@ -196,14 +204,6 @@ const Article = () => {
               ))}
             </ul>
           </div>
-          {/* Feed */}
-          <div className="col-span-2 flex flex-col leading-8">
-            {mdxContent ? (
-              <MDXRenderer source={mdxContent} />
-            ) : (
-              <p>Loading MDX...</p>
-            )}
-          </div>
         </div>
       </main>
       {/*
@@ -212,7 +212,7 @@ const Article = () => {
       <div className="flex flex-col justify-center py-10 items-center bg-gray-100 p-5  md:px-14 xl:px-20">
         <ResumeForm />
         <iframe
-          src="https://talent-assessment.testgorilla.com/75af304e-79f4-49c4-8307-5653e458691f/overview"
+          src="https://talent-assessment.testgorilla.com/75af304e-79f4-49c4-8307-5653e458691f"
           width="100%"
           height="100vh"
           className="overflow-hidden h-screen"

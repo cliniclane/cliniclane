@@ -4,27 +4,27 @@ import { FaSearch } from "react-icons/fa";
 
 export default function Navbar() {
   return (
-    <nav className="bg-black m-4 text-white px-10 xl:px-[70px] py-4 flex items-center justify-between rounded-lg">
+    <nav className="m-4 px-10 xl:px-[70px] py-4 flex items-center justify-between rounded-lg">
       {/* Logo */}
       <Link
         href={"/"}
-        className={`text-green-400 text-2xl font-bold ${merriweather.className}`}
+        className={`text-green-500 text-2xl font-bold ${merriweather.className}`}
       >
         Cliniclane
       </Link>
 
       {/* Navigation Links */}
-      <div className="hidden md:flex space-x-6 text-gray-300">
-        <a href="#" className="hover:text-white">
-          Product
+      <div className="hidden md:flex space-x-6 text-gray-950">
+        <a href="#" className="hover:text-gray-500">
+          News
         </a>
-        <a href="#" className="hover:text-white">
-          Project
+        <a href="#" className="hover:text-gray-500">
+          Categories
         </a>
-        <a href="#" className="hover:text-white">
-          Community
-        </a>
-        <Link href="/about" className="hover:text-white">
+        <Link href="/contact" className="hover:text-gray-500">
+          Contact
+        </Link>
+        <Link href="/about" className="hover:text-gray-500">
           About
         </Link>
       </div>
@@ -32,7 +32,7 @@ export default function Navbar() {
       {/* Search Icon and Button */}
       <div className="flex items-center space-x-4">
         <span className="font-semibold text-xl">Subscribe</span>
-        <FaSearch className="text-gray-300 hover:text-white cursor-pointer" />
+        <FaSearch className="hover:text-gray-500 text-gray-950 cursor-pointer" />
       </div>
     </nav>
   );

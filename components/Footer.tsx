@@ -71,12 +71,12 @@ export default function Footer() {
         {/* Bottom Section: Copyright */}
         <div className="text-xs text-gray-600 mt-8">
           <p>
-            © 2025 Healthline Media LLC. All rights reserved. Healthline Media
+            © 2025 Cliniclane Media LLC. All rights reserved. Cliniclane Media
             is an RVO Health Company.
           </p>
           <p>
             Our website services, content, and products are for informational
-            purposes only. Healthline Media does not provide medical advice,
+            purposes only. Cliniclane Media does not provide medical advice,
             diagnosis, or treatment.
           </p>
         </div>
