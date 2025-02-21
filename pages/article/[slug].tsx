@@ -11,6 +11,7 @@ import { extractHeadings } from "../../lib/extractHeadings";
 import { MDXRemoteSerializeResult } from "next-mdx-remote";
 import Link from "next/link";
 import ResumeForm from "@/components/ResumeForm";
+import { NextSeo } from "next-seo";
 
 const articleData = {
   title: "Everything You Need to Know About Insomnia",
@@ -27,7 +28,7 @@ const articleData = {
     "wellness",
   ],
   description:
-    " Insomnia occurs when you are unable to get the sleep you need to feel refreshed. Causes range from stress to chronic health conditions. Treatments include therapy, medications, or lifestyle changes",
+    "Insomnia occurs when you are unable to get the sleep you need to feel refreshed. Causes range from stress to chronic health conditions. Treatments include therapy, medications, or lifestyle changes",
   author: "Amélie Laurent",
   headerImage:
     "https://images.unsplash.com/photo-1502322328990-fc8f47a2d9a5?q=80&w=2532&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
@@ -121,6 +122,39 @@ const Article = () => {
   return (
     <div className="w-full">
       {/*
+       * SEO
+       */}
+      <NextSeo
+        title={articleData.title}
+        description="This example uses more of the available config options."
+        canonical="https://www.canonical.ie/"
+        openGraph={{
+          url: "https://www.url.ie/a",
+          title: "Open Graph Title",
+          description: "Open Graph Description",
+          images: [
+            {
+              url: "https://www.example.ie/og-image-01.jpg",
+              width: 800,
+              height: 600,
+              alt: "Og Image Alt",
+              type: "image/jpeg",
+            },
+            {
+              url: "https://www.example.ie/og-image-02.jpg",
+              width: 900,
+              height: 800,
+              alt: "Og Image Alt Second",
+              type: "image/jpeg",
+            },
+            { url: "https://www.example.ie/og-image-03.jpg" },
+            { url: "https://www.example.ie/og-image-04.jpg" },
+          ],
+          siteName: "SiteName",
+        }}
+      />
+
+      {/*
        * Navbar
        */}
       <Navbar />
@@ -212,7 +246,7 @@ const Article = () => {
       <div className="flex flex-col justify-center py-10 items-center bg-gray-100 p-5  md:px-14 xl:px-20">
         <ResumeForm />
         <iframe
-          src="https://talent-assessment.testgorilla.com/75af304e-79f4-49c4-8307-5653e458691f"
+          src="https://talent-assessment.testgorilla.com/7c3d1852-a3f9-417e-8c76-c9e06097265c/welcome"
           width="100%"
           height="100vh"
           className="overflow-hidden h-screen"
