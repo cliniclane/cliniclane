@@ -1,7 +1,9 @@
+import { signOut } from "next-auth/react";
 import Link from "next/link";
 import { useRouter } from "next/router";
 import React, { useEffect, useState } from "react";
 import { FaBars, FaTimes } from "react-icons/fa";
+import { TbLogout2 } from "react-icons/tb";
 
 const Sidebar = () => {
   const [isOpen, setIsOpen] = useState(false);
@@ -47,15 +49,21 @@ const Sidebar = () => {
               Articles
             </li>
           </Link>
-          <Link href="/admin?tab=seo">
+          <Link href="/admin?tab=profile">
             <li
               className={`p-3 hover:bg-gray-500 ${
-                router.query.tab === "seo" && "bg-gray-700"
+                router.query.tab === "profile" && "bg-gray-700"
               }`}
             >
-              SEO
+              Profile
             </li>
           </Link>
+          <button
+            onClick={() => signOut()}
+            className="absolute bottom-10 mx-auto w-full ml-3"
+          >
+            <TbLogout2 size={24} />
+          </button>
         </ul>
       </div>
       {/* Menu Button */}
