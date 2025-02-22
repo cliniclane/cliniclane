@@ -1,5 +1,5 @@
 import { atkinsonHyperlegible } from "@/lib/font";
-import "@/styles/globals.css";
+import "@/styles/globals.css"; // Your global styles
 import type { AppProps } from "next/app";
 
 export default function App({ Component, pageProps }: AppProps) {

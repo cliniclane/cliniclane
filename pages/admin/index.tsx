@@ -3,12 +3,30 @@ import { Articles as IArticles } from "@prisma/client";
 import Link from "next/link";
 import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
+import toast from "react-hot-toast";
 import { FaEdit } from "react-icons/fa";
 import { MdDeleteForever } from "react-icons/md";
 
 export default function Articles() {
   const router = useRouter();
   const [articles, setArticles] = useState<IArticles[]>([]);
+
+  // Delete Article
+  const deleteArticle = async (id: string) => {
+    const url = `${process.env.NEXT_PUBLIC_NEXTAUTH_URL}/api/article?id=${id}`;
+    console.log(url);
+    const res = await fetch(url, {
+      method: "DELETE",
+    });
+
+    if (res.ok) {
+      toast.success("Article deleted successfully");
+      const newArticles = articles.filter((article) => article.id !== id);
+      setArticles(newArticles);
+    } else {
+      toast.error("Failed to delete article");
+    }
+  };
 
   useEffect(() => {
     const fetchArticles = async () => {
@@ -31,9 +49,17 @@ export default function Articles() {
 
       {/* Content */}
       <div className="md:pl-72 py-10 px-4 sm:px-6 mt-10 md:mt-0 w-full">
-        <p className="text-2xl font-medium underline text-gray-500">
-          All Articles
-        </p>
+        <div className="flex w-full justify-between">
+          <span className="text-2xl font-medium underline text-gray-500">
+            All Articles
+          </span>
+          <Link
+            href="/admin/article/new?tab=basic"
+            className="bg-blue-500 px-5 py-2 text-white rounded-md"
+          >
+            New Article
+          </Link>
+        </div>
 
         {/* Responsive Table */}
         <div className="overflow-x-auto mt-6">
@@ -71,12 +97,15 @@ export default function Articles() {
                   </td>
                   <td className="px-4 py-4 flex gap-4">
                     <Link
-                      href={`/admin/edit/${article.id}?tab=basic`}
+                      href={`/admin/article/edit/${article.id}?tab=basic`}
                       className="text-xl"
                     >
                       <FaEdit />
                     </Link>
-                    <button className="text-2xl text-red-600">
+                    <button
+                      onClick={() => deleteArticle(article.id)}
+                      className="text-2xl text-red-600"
+                    >
                       <MdDeleteForever />
                     </button>
                   </td>

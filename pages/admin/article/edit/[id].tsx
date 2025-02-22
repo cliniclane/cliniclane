@@ -89,7 +89,7 @@ const EditArticle = () => {
 
   useEffect(() => {
     if (tab && !activeTab) setActiveTab(tab as string);
-    if (!router.query.tab && id) router.push(`/admin/edit/${id}?tab=basic`);
+    if (!router.query.tab && id) router.push(`/admin/article/edit/${id}?tab=basic`);
   }, [tab, id]);
 
   return (
@@ -104,7 +104,7 @@ const EditArticle = () => {
                 <button
                   onClick={() => {
                     setActiveTab(tab.name);
-                    router.push(`/admin/edit/${id}?tab=${tab.name}`);
+                    router.push(`/admin/article/edit/${id}?tab=${tab.name}`);
                   }}
                   className={`inline-block capitalize p-4 border-b-2 rounded-t-lg ${
                     tab.disabled

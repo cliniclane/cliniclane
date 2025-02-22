@@ -2,7 +2,6 @@ import Footer from "@/components/Footer";
 import Navbar from "@/components/Navbar";
 import Image from "next/image";
 import { BsArrowRight } from "react-icons/bs";
-
 import { IoCopyOutline } from "react-icons/io5";
 import { useEffect, useState } from "react";
 import { serialize } from "next-mdx-remote/serialize";
@@ -12,95 +11,14 @@ import { MDXRemoteSerializeResult } from "next-mdx-remote";
 import Link from "next/link";
 import ResumeForm from "@/components/ResumeForm";
 import { NextSeo } from "next-seo";
+import { Articles } from "@prisma/client";
+import { GetServerSideProps } from "next";
 
-const articleData = {
-  title: "Everything You Need to Know About Insomnia",
-  slug: "everything_you_need_to_know_about_insomnia",
-  tags: [
-    "insomnia",
-    "health",
-    "fatigue",
-    "lifestyle",
-    "food",
-    "mental health",
-    "sleep",
-    "meditation",
-    "wellness",
-  ],
-  description:
-    "Insomnia occurs when you are unable to get the sleep you need to feel refreshed. Causes range from stress to chronic health conditions. Treatments include therapy, medications, or lifestyle changes",
-  author: "Amélie Laurent",
-  headerImage:
-    "https://images.unsplash.com/photo-1502322328990-fc8f47a2d9a5?q=80&w=2532&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
-  publishDate: "2025-02-17T00:00:00.000Z",
-  mdxString: `# Introduction
+interface ArticleProps {
+  articleData: Articles;
+}
 
-## What is Insomnia?
-
-Insomnia is a common sleep disorder that makes it difficult to fall asleep, stay asleep, or wake up too early and not be able to go back to sleep. Over time, it can lead to serious health issues, affecting both physical and mental well-being.
-
-## Causes of Insomnia
-
-There are several potential causes of insomnia, including:
-
-- **Stress and Anxiety** – Overthinking and stress can keep your brain active at night.
-- **Poor Sleep Habits** – Irregular sleep schedules, using screens before bed, or an uncomfortable sleep environment.
-- **Medical Conditions** – Chronic pain, asthma, or acid reflux can disrupt sleep.
-- **Caffeine & Alcohol** – Stimulants like coffee and excessive alcohol intake can interfere with sleep cycles.
-- **Lifestyle Factors** – Shift work, frequent travel, or an inconsistent bedtime routine.
-
-# Effects of Insomnia
-
-Lack of sleep can have several negative consequences, including:
-
-- **Daytime Fatigue** – Low energy and reduced productivity.
-- **Memory Issues** – Difficulty concentrating and remembering things.
-- **Weakened Immune System** – Increased risk of illnesses.
-- **Mood Disorders** – Anxiety, depression, and irritability.
-- **Increased Risk of Chronic Conditions** – Heart disease, obesity, and diabetes.
-
-# How to Improve Sleep Quality
-
-### 1. Maintain a Consistent Sleep Schedule
-Going to bed and waking up at the same time every day helps regulate your body’s internal clock.
-
-### 2. Create a Relaxing Bedtime Routine
-Engage in calming activities before bed, such as:
-- Reading a book
-- Meditation or deep breathing exercises
-- Listening to soft music
-
-### 3. Limit Screen Time Before Bed
-Exposure to blue light from phones and computers can suppress melatonin production, making it harder to sleep.
-
-### 4. Watch Your Diet
-Avoid caffeine and heavy meals before bedtime. Instead, try herbal teas like chamomile.
-
-### 5. Optimize Your Sleep Environment
-Ensure your bedroom is:
-- Dark
-- Quiet
-- Cool
-- Comfortable
-
-### 6. Exercise Regularly
-Physical activity during the day can improve sleep quality, but avoid intense workouts right before bed.
-
-## When to Seek Help
-
-If your insomnia persists for weeks and affects your daily life, consult a healthcare professional. Sleep therapy or medication may be needed in some cases.
-
-# Conclusion
-
-Insomnia can be frustrating, but with the right lifestyle changes and habits, you can improve your sleep quality and overall well-being. Prioritize good sleep hygiene and seek professional help if necessary.
-
----
-
-**Did you find this helpful?**
-`,
-};
-
-const Article = () => {
+const Article = ({ articleData }: ArticleProps) => {
   const [mdxContent, setMdxContent] = useState<MDXRemoteSerializeResult<
     Record<string, unknown>,
     Record<string, unknown>
@@ -126,31 +44,31 @@ const Article = () => {
        */}
       <NextSeo
         title={articleData.title}
-        description="This example uses more of the available config options."
-        canonical="https://www.canonical.ie/"
+        description={articleData.description}
+        canonical={articleData.canonical}
         openGraph={{
-          url: "https://www.url.ie/a",
-          title: "Open Graph Title",
-          description: "Open Graph Description",
+          url: articleData.canonical,
+          title: articleData.openGraphTitle || "",
+          description: articleData.openGraphDescription || "",
           images: [
             {
-              url: "https://www.example.ie/og-image-01.jpg",
+              url: articleData.openGraphImage || "",
               width: 800,
               height: 600,
               alt: "Og Image Alt",
               type: "image/jpeg",
             },
             {
-              url: "https://www.example.ie/og-image-02.jpg",
+              url: articleData.openGraphImage || "",
               width: 900,
               height: 800,
               alt: "Og Image Alt Second",
               type: "image/jpeg",
             },
-            { url: "https://www.example.ie/og-image-03.jpg" },
-            { url: "https://www.example.ie/og-image-04.jpg" },
+            { url: articleData.openGraphImage || "" },
+            { url: articleData.openGraphImage || "" },
           ],
-          siteName: "SiteName",
+          siteName: "ClinicLane",
         }}
       />
 
@@ -258,6 +176,33 @@ const Article = () => {
       <Footer />
     </div>
   );
+};
+
+export const getServerSideProps: GetServerSideProps<ArticleProps> = async ({
+  params,
+}) => {
+  const slug = params?.slug as string;
+
+  const url = `${process.env.NEXT_PUBLIC_NEXTAUTH_URL}/api/article/${slug}`;
+ 
+  const res = await fetch(url, {
+    method: "GET",
+    headers: {
+      "Content-Type": "application/json",
+    },
+  });
+
+  const data: Articles = await res.json();
+
+  if (!data) {
+    return {
+      notFound: true,
+    };
+  }
+
+  return {
+    props: { articleData: data },
+  };
 };
 
 export default Article;

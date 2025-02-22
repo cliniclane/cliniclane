@@ -40,5 +40,33 @@ export default async function handler(
       console.log(error);
       res.status(500).json({ error: "Failed to create article" });
     }
+  } else if (req.method === "POST") {
+    const { ...updateData } = req.body;
+
+    try {
+      const article = await prisma.articles.create({
+        data: updateData,
+      });
+
+      res.status(201).json(article);
+    } catch (error: unknown) {
+      console.log(error);
+      res.status(500).json({ error: "Failed to create article" });
+    }
+  } else if (req.method === "DELETE") {
+    const { id } = req.query;
+    if (!id) {
+      return res.status(400).json({ error: "ID is required" });
+    }
+    try {
+      const article = await prisma.articles.delete({
+        where: { id: id as string },
+      });
+
+      res.status(201).json(article);
+    } catch (error: unknown) {
+      console.log(error);
+      res.status(500).json({ error: "Failed to delete article" });
+    }
   }
 }
