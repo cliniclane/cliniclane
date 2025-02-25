@@ -1,4 +1,4 @@
-import { merriweather } from "@/lib/font";
+import Image from "next/image";
 import Link from "next/link";
 import { FaSearch } from "react-icons/fa";
 
@@ -6,12 +6,7 @@ export default function Navbar() {
   return (
     <nav className="m-4 px-10 xl:px-[70px] py-4 flex items-center justify-between rounded-lg">
       {/* Logo */}
-      <Link
-        href={"/"}
-        className={`text-green-500 text-2xl font-bold ${merriweather.className}`}
-      >
-        Cliniclane
-      </Link>
+      <Image src="/logo.png" width="140" height="80" alt="" />
 
       {/* Navigation Links */}
       <div className="hidden md:flex space-x-6 text-gray-950">
