@@ -5,8 +5,8 @@ import { BsArrowRight } from "react-icons/bs";
 import { IoCopyOutline } from "react-icons/io5";
 import { useEffect, useState } from "react";
 import { serialize } from "next-mdx-remote/serialize";
-import MDXRenderer from "../../components/MDXRenderer";
-import { extractHeadings } from "../../lib/extractHeadings";
+import MDXRenderer from "../components/MDXRenderer";
+import { extractHeadings } from "../lib/extractHeadings";
 import { MDXRemoteSerializeResult } from "next-mdx-remote";
 import Link from "next/link";
 import ResumeForm from "@/components/ResumeForm";
@@ -113,7 +113,7 @@ const Article = ({ articleData }: ArticleProps) => {
               {/* Bottom Left Text */}
               <div className="absolute bottom-4 left-4 text-white text-sm">
                 <p className="font-light">Written by</p>
-                <p className="font-semibold">{articleData.author}</p>
+                <p className="font-semibold">{articleData.author || "Sid"}</p>
               </div>
               <div className="absolute bottom-4 left-40 text-white text-sm">
                 <p className="font-light">Published on</p>
@@ -184,7 +184,7 @@ export const getServerSideProps: GetServerSideProps<ArticleProps> = async ({
   const slug = params?.slug as string;
 
   const url = `${process.env.NEXT_PUBLIC_NEXTAUTH_URL}/api/article/${slug}`;
- 
+
   const res = await fetch(url, {
     method: "GET",
     headers: {

@@ -42,14 +42,14 @@ const MDXRenderer: React.FC<MDXRendererProps> = ({ source }) => {
             },
             li: ({ children }) => {
               return (
-                <li className="list-disc text-lg list-inside text-gray-800 mb-2">
+                <li className="list-disc text-lg text-gray-800 mb-2">
                   {children}
                 </li>
               );
             },
             ol: ({ children }) => {
               return (
-                <ol className="list-decimal list-inside text-lg text-gray-800 mb-2">
+                <ol className="list-decimal text-lg text-gray-800 mb-2">
                   {children}
                 </ol>
               );
