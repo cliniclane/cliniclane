@@ -42,7 +42,7 @@ const MDXRenderer: React.FC<MDXRendererProps> = ({ source }) => {
             },
             li: ({ children }) => {
               return (
-                <li className="list-disc text-lg text-gray-800 mb-2">
+                <li className="list-disc ml-5 text-lg text-gray-800 mb-2">
                   {children}
                 </li>
               );
