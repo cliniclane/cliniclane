@@ -1,4 +1,6 @@
-import React, { useState } from "react";
+import React, { FormEvent, useRef, useState } from "react";
+import emailjs from "@emailjs/browser";
+import toast from "react-hot-toast";
 
 const ResumeForm = () => {
   const [formData, setFormData] = useState({
@@ -16,10 +18,13 @@ const ResumeForm = () => {
     weaknesses: "",
     uniqueSkill: "",
     resumeWalkthrough: "",
-    resumeFile: null,
-    passportFile: null,
+    resumeFile: null as File | null,
+    passportFile: null as File | null,
   });
 
+  const form = useRef<HTMLFormElement>(null);
+
+  // Handle text, select, and textarea inputs
   const handleChange = (
     e: React.ChangeEvent<
       HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement
@@ -29,28 +34,106 @@ const ResumeForm = () => {
     setFormData({ ...formData, [name]: value });
   };
 
+  // Handle file uploads
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, files } = e.target;
-    if (files) {
-      setFormData({ ...formData, [name]: files[0] });
+    if (files && files[0]) {
+      const reader = new FileReader();
+      reader.readAsDataURL(files[0]); // Convert file to Base64
+      reader.onload = () => {
+        setFormData({ ...formData, [name]: reader.result as string });
+      };
     }
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const sendEmail = (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    console.log("Form Data:", formData);
+
+    emailjs
+      .sendForm(
+        process.env.NEXT_PUBLIC_EMAILJS_SERVICE_ID!,
+        process.env.NEXT_PUBLIC_EMAILJS_TEMPLATE_ID!,
+        form.current!,
+        {
+          publicKey: process.env.NEXT_PUBLIC_EMAILJS_PUBLIC_KEY,
+        }
+      )
+      .then(
+        () => {
+          console.log("SUCCESS!");
+          toast.success("Form submitted successfully!");
+          setFormData({
+            name: "",
+            email: "",
+            phone: "",
+            position: "",
+            salaryExpectation: "",
+            jobLocation: "",
+            visaStatus: "",
+            animalChoice: "",
+            coverLetter: "",
+            leavingReason: "",
+            rightCandidate: "",
+            weaknesses: "",
+            uniqueSkill: "",
+            resumeWalkthrough: "",
+            resumeFile: null,
+            passportFile: null,
+          });
+          form.current?.reset();
+        },
+        (error) => {
+          console.log("FAILED...", error.text);
+          toast.error("Submission failed. Please try again.");
+        }
+      );
+  };
+
+  // Handle form submission with validation
+  const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+
+    // Check if required fields are filled
+    const requiredFields = [
+      "name",
+      "email",
+      "phone",
+      "position",
+      "salaryExpectation",
+      "jobLocation",
+      "visaStatus",
+      "animalChoice",
+      "leavingReason",
+      "rightCandidate",
+      "weaknesses",
+      "uniqueSkill",
+      "resumeWalkthrough",
+      "resumeFile",
+      "passportFile",
+    ];
+
+    for (const field of requiredFields) {
+      if (!formData[field as keyof typeof formData]) {
+        toast.error("Please fill out all required fields.");
+        return;
+      }
+    }
+
+    sendEmail(e);
   };
 
   return (
     <form
       onSubmit={handleSubmit}
-      className="bg-white p-6 rounded-tl-lg pb-10 w-full"
+      ref={form}
+      className="bg-white p-6 rounded-lg pb-10 w-full"
     >
       <h2 className="text-2xl font-semibold text-center mb-6">
         Submit Your Resume
       </h2>
+
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4 items-baseline">
-        {/* Text Inputs with Labels */}
+        {/* Text Inputs */}
         {[
           {
             label: "Name",
@@ -77,10 +160,10 @@ const ResumeForm = () => {
             placeholder: "Position name",
           },
           {
-            label: "What is your salary expectation?",
+            label: "Salary Expectation",
             name: "salaryExpectation",
             type: "text",
-            placeholder: "What is your salary expectation",
+            placeholder: "Enter your expected salary",
           },
         ].map((field, index) => (
           <div key={index}>
@@ -88,6 +171,8 @@ const ResumeForm = () => {
             <input
               type={field.type}
               name={field.name}
+              // @ts-expect-error:""
+              value={formData[field.name as keyof typeof formData] || ""}
               placeholder={field.placeholder}
               onChange={handleChange}
               className="input-field"
@@ -95,7 +180,7 @@ const ResumeForm = () => {
           </div>
         ))}
 
-        {/* Select Inputs with Labels */}
+        {/* Select Inputs */}
         {[
           {
             label: "Preferred Job Location",
@@ -112,6 +197,8 @@ const ResumeForm = () => {
             <label className="input-label">{field.label}</label>
             <select
               name={field.name}
+              // @ts-expect-error:""
+              value={formData[field.name as keyof typeof formData] || ""}
               onChange={handleChange}
               className="input-field"
             >
@@ -125,7 +212,7 @@ const ResumeForm = () => {
           </div>
         ))}
 
-        {/* Text Inputs with Labels */}
+        {/* Text Inputs */}
         {[
           {
             label: "What are your weaknesses?",
@@ -135,23 +222,22 @@ const ResumeForm = () => {
           {
             label: "If you were an animal, which would you be?",
             name: "animalChoice",
-            placeholder: "Animal which matches your personality",
+            placeholder: "Animal that matches your personality",
           },
           {
             label: "Why are you leaving your current job?",
             name: "leavingReason",
-            placeholder: "Reason?",
+            placeholder: "Reason for leaving",
           },
           {
-            label: "Why are you the right candidate for this job?",
+            label: "Why are you the right candidate?",
             name: "rightCandidate",
-            placeholder: "Explain?",
+            placeholder: "Explain why you are a good fit",
           },
-
           {
             label: "What can you do for us that others can't?",
             name: "uniqueSkill",
-            placeholder: "Explain",
+            placeholder: "Describe your unique skill",
           },
           {
             label: "Walk me through your resume",
@@ -163,6 +249,8 @@ const ResumeForm = () => {
             <label className="input-label">{field.label}</label>
             <input
               name={field.name}
+              // @ts-expect-error:""
+              value={formData[field.name as keyof typeof formData] || ""}
               placeholder={field.placeholder}
               onChange={handleChange}
               className="input-field"
@@ -173,7 +261,7 @@ const ResumeForm = () => {
         {/* File Inputs */}
         {[
           { label: "Attach Resume File", name: "resumeFile" },
-          { label: "Upload your Passport size picture", name: "passportFile" },
+          { label: "Upload Your Passport Size Picture", name: "passportFile" },
         ].map((field, index) => (
           <div key={index}>
             <label className="input-label">{field.label}</label>
