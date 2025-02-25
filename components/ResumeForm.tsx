@@ -108,8 +108,7 @@ const ResumeForm = () => {
       "weaknesses",
       "uniqueSkill",
       "resumeWalkthrough",
-      "resumeFile",
-      "passportFile",
+      "coverLetter",
     ];
 
     for (const field of requiredFields) {
@@ -119,11 +118,19 @@ const ResumeForm = () => {
       }
     }
 
+    if (form.current) {
+      // Clear specific input values
+      const fileInputs = form.current.querySelectorAll('input[type="file"]');
+      // @ts-expect-error:""
+      fileInputs.forEach((input) => (input.value = "")); // Reset the file input
+    }
+
     sendEmail(e);
   };
 
   return (
     <form
+      id="resumeform"
       onSubmit={handleSubmit}
       ref={form}
       className="bg-white p-6 rounded-lg pb-10 w-full"
@@ -150,7 +157,7 @@ const ResumeForm = () => {
           {
             label: "Phone Number",
             name: "phone",
-            type: "text",
+            type: "number",
             placeholder: "Enter your phone number",
           },
           {
@@ -162,7 +169,7 @@ const ResumeForm = () => {
           {
             label: "Salary Expectation",
             name: "salaryExpectation",
-            type: "text",
+            type: "number",
             placeholder: "Enter your expected salary",
           },
         ].map((field, index) => (
@@ -194,7 +201,7 @@ const ResumeForm = () => {
           },
         ].map((field, index) => (
           <div key={index}>
-            <label className="input-label">{field.label}</label>
+            <label className="input-label text-sm">{field.label}</label>
             <select
               name={field.name}
               // @ts-expect-error:""
@@ -214,6 +221,11 @@ const ResumeForm = () => {
 
         {/* Text Inputs */}
         {[
+          {
+            label: "Description or Cover later",
+            name: "coverLetter",
+            placeholder: "Your weaknesses?",
+          },
           {
             label: "What are your weaknesses?",
             name: "weaknesses",
@@ -246,9 +258,10 @@ const ResumeForm = () => {
           },
         ].map((field, index) => (
           <div key={index} className="flex flex-col items-baseline">
-            <label className="input-label">{field.label}</label>
-            <input
+            <label className="input-label text-sm">{field.label}</label>
+            <textarea
               name={field.name}
+              cols={1}
               // @ts-expect-error:""
               value={formData[field.name as keyof typeof formData] || ""}
               placeholder={field.placeholder}
@@ -264,7 +277,7 @@ const ResumeForm = () => {
           { label: "Upload Your Passport Size Picture", name: "passportFile" },
         ].map((field, index) => (
           <div key={index}>
-            <label className="input-label">{field.label}</label>
+            <label className="input-label text-sm">{field.label}</label>
             <input
               type="file"
               name={field.name}

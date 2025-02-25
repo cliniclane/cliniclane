@@ -13,15 +13,15 @@ export default function Navbar() {
         <a href="#" className="hover:text-gray-500">
           News
         </a>
-        <a href="#" className="hover:text-gray-500">
-          Categories
-        </a>
         <Link href="/contact" className="hover:text-gray-500">
           Contact
         </Link>
         <Link href="/about" className="hover:text-gray-500">
           About
         </Link>
+        <a href="#resumeform" className="hover:text-gray-500">
+          Career
+        </a>
       </div>
 
       {/* Search Icon and Button */}
