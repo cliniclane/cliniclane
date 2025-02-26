@@ -22,6 +22,7 @@ const ResumeForm = () => {
     resumeFile: null as File | null,
     passportFile: null as File | null,
   });
+  const [loading, setLoading] = useState(false);
 
   const form = useRef<HTMLFormElement>(null);
   const router = useRouter();
@@ -82,10 +83,12 @@ const ResumeForm = () => {
             resumeFile: null,
             passportFile: null,
           });
+          setLoading(false);
           form.current?.reset();
         },
         (error) => {
           console.log("FAILED...", error.text);
+          setLoading(false);
           toast.error("Submission failed. Please try again.");
         }
       );
@@ -94,6 +97,7 @@ const ResumeForm = () => {
   // Handle form submission with validation
   const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+    setLoading(true);
 
     // Check if required fields are filled
     const requiredFields = [
@@ -116,6 +120,7 @@ const ResumeForm = () => {
     for (const field of requiredFields) {
       if (!formData[field as keyof typeof formData]) {
         toast.error("Please fill out all required fields.");
+        setLoading(false);
         return;
       }
     }
@@ -269,7 +274,8 @@ const ResumeForm = () => {
         {/* Submit Button */}
         <button
           type="submit"
-          className="mt-6 w-fit px-16 bg-blue-600 text-white py-2 rounded-md"
+          disabled={loading}
+          className="mt-6 w-60 disabled:bg-gray-300 bg-blue-600 text-white py-3 rounded-md"
         >
           Submit
         </button>

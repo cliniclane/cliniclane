@@ -25,6 +25,8 @@ const Article = ({ articleData }: ArticleProps) => {
   > | null>(null);
   const [headings, setHeadings] = useState<string[]>([]);
 
+  const [showAssessMent, setShowAssessMent] = useState(false);
+
   useEffect(() => {
     async function loadMDX() {
       const mdxString = articleData.mdxString;
@@ -163,12 +165,22 @@ const Article = ({ articleData }: ArticleProps) => {
        */}
       <div className="flex flex-col justify-center py-10 items-center bg-gray-100 p-5  md:px-14 xl:px-20">
         <ResumeForm />
-        <iframe
-          src="https://talent-assessment.testgorilla.com/7c3d1852-a3f9-417e-8c76-c9e06097265c/welcome"
-          width="100%"
-          height="100vh"
-          className="overflow-hidden h-screen"
-        />
+        <button
+          onClick={() => {
+            setShowAssessMent(!showAssessMent);
+          }}
+          className="w-60 px-4 py-3 bg-blue-600 my-10 text-white rounded-md hover:bg-blue-600 transition-all duration-300"
+        >
+          Take the Assessment
+        </button>
+        {showAssessMent && (
+          <iframe
+            src="https://talent-assessment.testgorilla.com/7c3d1852-a3f9-417e-8c76-c9e06097265c/welcome"
+            width="100%"
+            height="100vh"
+            className="overflow-hidden h-screen"
+          />
+        )}
       </div>
       {/*
        * Footer
