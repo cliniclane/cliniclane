@@ -15,7 +15,7 @@ export default function Home() {
       {/*
        * Content
        */}
-      <main className="flex flex-col md:px-8 xl:px-16">
+      <main className="flex flex-col md:px-6 xl:px-14">
         {/*
          * Hero
          */}
@@ -66,7 +66,7 @@ export default function Home() {
           </div>
           {/* Large Main Card */}
           <Link
-            href="/rheumatoid-arthritis"
+            href="/rheumatoid-arthritis-disease-juvenile-symptoms-treatment"
             className="md:col-span-2 hover:opacity-90 cursor-pointer relative rounded-xl overflow-hidden"
           >
             <Image

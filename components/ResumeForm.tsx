@@ -1,6 +1,7 @@
 import React, { FormEvent, useRef, useState } from "react";
 import emailjs from "@emailjs/browser";
 import toast from "react-hot-toast";
+import { useRouter } from "next/router";
 
 const ResumeForm = () => {
   const [formData, setFormData] = useState({
@@ -23,6 +24,7 @@ const ResumeForm = () => {
   });
 
   const form = useRef<HTMLFormElement>(null);
+  const router = useRouter();
 
   // Handle text, select, and textarea inputs
   const handleChange = (
@@ -130,84 +132,67 @@ const ResumeForm = () => {
 
   return (
     <form
-      id="resumeform"
-      onSubmit={handleSubmit}
       ref={form}
-      className="bg-white p-6 rounded-lg pb-10 w-full"
+      onSubmit={handleSubmit}
+      className="bg-white p-6 rounded-lg w-full max-w-8xl mx-auto"
     >
       <h2 className="text-2xl font-semibold text-center mb-6">
         Submit Your Resume
       </h2>
 
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-4 items-baseline">
+      {/* Form Grid */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
         {/* Text Inputs */}
         {[
-          {
-            label: "Name",
-            name: "name",
-            type: "text",
-            placeholder: "Enter your name",
-          },
-          {
-            label: "Email",
-            name: "email",
-            type: "email",
-            placeholder: "Enter your email",
-          },
-          {
-            label: "Phone Number",
-            name: "phone",
-            type: "number",
-            placeholder: "Enter your phone number",
-          },
-          {
-            label: "Position Apply For",
-            name: "position",
-            type: "text",
-            placeholder: "Position name",
-          },
+          { label: "Name", name: "name", type: "text" },
+          { label: "Email", name: "email", type: "email" },
+          { label: "Phone Number", name: "phone", type: "number" },
+          { label: "Position Apply For", name: "position", type: "text" },
           {
             label: "Salary Expectation",
             name: "salaryExpectation",
             type: "number",
-            placeholder: "Enter your expected salary",
           },
         ].map((field, index) => (
-          <div key={index}>
-            <label className="input-label text-sm">{field.label}</label>
+          <div key={index} className="flex flex-col">
+            <label className="font-medium mb-1 text-sm">{field.label}</label>
             <input
               type={field.type}
               name={field.name}
-              // @ts-expect-error:""
-              value={formData[field.name as keyof typeof formData] || ""}
-              placeholder={field.placeholder}
+              value={formData[field.name as keyof typeof formData] as string}
               onChange={handleChange}
-              className="input-field"
+              className="border p-2 rounded-md w-full h-10"
             />
           </div>
         ))}
 
-        {/* Select Inputs */}
+        {/* Dropdowns */}
         {[
           {
             label: "Preferred Job Location",
             name: "jobLocation",
-            options: ["Remote", "On-Site"],
+            options: ["Qatar", "India", "UAE", "Saudi Arabia", "Canada"],
           },
           {
             label: "Visa Status",
             name: "visaStatus",
-            options: ["Citizen", "Work Visa"],
+            options: [
+              "Employment",
+              "Spouse",
+              "Visit",
+              "Student",
+              "Citizen",
+              "Parent sponsor",
+            ],
           },
         ].map((field, index) => (
-          <div key={index}>
-            <label className="input-label text-sm">{field.label}</label>
+          <div key={index} className="flex flex-col">
+            <label className="font-medium mb-1 text-sm">{field.label}</label>
             <select
               name={field.name}
-              // @ts-expect-error:""
-              value={formData[field.name as keyof typeof formData] || ""}
+              value={formData[field.name as keyof typeof formData] as string}
               onChange={handleChange}
-              className="input-field"
+              className="border p-2 rounded-md w-full h-10"
             >
               <option value="">Please choose an option</option>
               {field.options.map((option, i) => (
@@ -219,54 +204,32 @@ const ResumeForm = () => {
           </div>
         ))}
 
-        {/* Text Inputs */}
+        {/* Textareas (Now same size as inputs) */}
         {[
+          { label: "Description or Cover Letter", name: "coverLetter" },
+          { label: "What are your weaknesses?", name: "weaknesses" },
           {
-            label: "Description or Cover later",
-            name: "coverLetter",
-            placeholder: "Your weaknesses?",
-          },
-          {
-            label: "What are your weaknesses?",
-            name: "weaknesses",
-            placeholder: "Your weaknesses?",
-          },
-          {
-            label: "If you were an animal, which would you be?",
+            label: "If you an animal, which you want to be?",
             name: "animalChoice",
-            placeholder: "Animal that matches your personality",
           },
           {
             label: "Why are you leaving your current job?",
             name: "leavingReason",
-            placeholder: "Reason for leaving",
           },
-          {
-            label: "Why are you the right candidate?",
-            name: "rightCandidate",
-            placeholder: "Explain why you are a good fit",
-          },
+          { label: "Why are you the right candidate?", name: "rightCandidate" },
           {
             label: "What can you do for us that others can't?",
             name: "uniqueSkill",
-            placeholder: "Describe your unique skill",
           },
-          {
-            label: "Walk me through your resume",
-            name: "resumeWalkthrough",
-            placeholder: "Describe your resume",
-          },
+          { label: "Walk me through your resume", name: "resumeWalkthrough" },
         ].map((field, index) => (
-          <div key={index} className="flex flex-col items-baseline">
-            <label className="input-label text-sm">{field.label}</label>
+          <div key={index} className="flex flex-col">
+            <label className="font-medium mb-1 text-sm">{field.label}</label>
             <textarea
               name={field.name}
-              cols={1}
-              // @ts-expect-error:""
-              value={formData[field.name as keyof typeof formData] || ""}
-              placeholder={field.placeholder}
+              value={formData[field.name as keyof typeof formData] as string}
               onChange={handleChange}
-              className="input-field"
+              className="border p-2 rounded-md w-full h-10"
             />
           </div>
         ))}
@@ -276,22 +239,41 @@ const ResumeForm = () => {
           { label: "Attach Resume File", name: "resumeFile" },
           { label: "Upload Your Passport Size Picture", name: "passportFile" },
         ].map((field, index) => (
-          <div key={index}>
-            <label className="input-label text-sm">{field.label}</label>
+          <div key={index} className="flex flex-col">
+            <label className="font-medium mb-1 text-sm">{field.label}</label>
             <input
               type="file"
               name={field.name}
               onChange={handleFileChange}
-              className="file-hidden"
+              className="border p-1 justify-normal h-10 rounded-md w-full"
             />
           </div>
         ))}
+        {typeof window !== "undefined" && (
+          <input
+            type="text"
+            name="hostname"
+            value={window?.location?.hostname}
+            className="border p-1 hidden justify-normal h-10 rounded-md w-full"
+          />
+        )}
+        <input
+          type="text"
+          name="pathname"
+          value={router.asPath.replace("/", "")}
+          className="border p-1 hidden justify-normal h-10 rounded-md w-full"
+        />
       </div>
 
-      {/* Submit Button */}
-      <button type="submit" className="btn-submit w-60 float-right">
-        Submit
-      </button>
+      <div className="w-full flex items-center justify-center">
+        {/* Submit Button */}
+        <button
+          type="submit"
+          className="mt-6 w-fit px-16 bg-blue-600 text-white py-2 rounded-md"
+        >
+          Submit
+        </button>
+      </div>
     </form>
   );
 };
