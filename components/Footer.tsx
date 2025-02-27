@@ -1,3 +1,4 @@
+import Link from "next/link";
 import {
   FaFacebookF,
   FaTwitter,
@@ -5,6 +6,33 @@ import {
   FaInstagram,
   FaYoutube,
 } from "react-icons/fa";
+
+const linksData = [
+  {
+    name: "About Us",
+    slug: "about",
+  },
+  {
+    name: "Contact Us",
+    slug: "contact",
+  },
+  {
+    name: "Privacy Policy",
+    slug: "privacy",
+  },
+  {
+    name: "Advertising Policy",
+    slug: "advertising",
+  },
+  {
+    name: "Sitemap",
+    slug: "sitemap",
+  },
+  {
+    name: "Medical Affairs",
+    slug: "medical",
+  },
+];
 
 export default function Footer() {
   return (
@@ -50,26 +78,19 @@ export default function Footer() {
 
         {/* Middle Section: Links */}
         <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4 text-sm">
-          {[
-            "About Us",
-            "Contact Us",
-            "Privacy Policy",
-            "Privacy Settings",
-            "Advertising Policy",
-            "Health Topics",
-            "Sitemap",
-            "Medical Affairs",
-            "Content Integrity",
-            "Newsletters",
-          ].map((link, index) => (
-            <a key={index} href="#" className="hover:underline">
-              {link}
-            </a>
+          {linksData.map((link, index) => (
+            <Link
+              href={"/" + link.slug}
+              key={index}
+              className="hover:underline"
+            >
+              {link.name}
+            </Link>
           ))}
         </div>
 
         {/* Bottom Section: Copyright */}
-        <div className="text-xs text-gray-600 mt-8">
+        <div className="text-sm text-gray-600 mt-8">
           <p>
             © 2025 Cliniclane Media LLC. All rights reserved. Cliniclane Media
             is an RVO Health Company.

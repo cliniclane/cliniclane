@@ -36,7 +36,7 @@ const MostPopular: FC<IProps> = ({ articles }) => {
           <div
             onClick={() => router.push(`/[slug]`, `/${article.slug}`)}
             key={index}
-            className="relative rounded-xl overflow-hidden cursor-pointer"
+            className="relative hover:opacity-80 rounded-xl overflow-hidden cursor-pointer"
           >
             <Image
               src={article.headerImage}

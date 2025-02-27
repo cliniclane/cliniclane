@@ -1,15 +1,16 @@
 import { signOut } from "next-auth/react";
 import Link from "next/link";
-import { useRouter } from "next/router";
-import React, { useEffect, useState } from "react";
+import React, { FC, useEffect, useState } from "react";
 import { FaBars, FaTimes } from "react-icons/fa";
 import { TbLogout2 } from "react-icons/tb";
 
-const Sidebar = () => {
+interface IProps {
+  selected: string;
+}
+
+const Sidebar: FC<IProps> = ({ selected }) => {
   const [isOpen, setIsOpen] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
-
-  const router = useRouter();
 
   useEffect(() => {
     const handleResize = () => {
@@ -40,22 +41,22 @@ const Sidebar = () => {
           )}
         </div>
         <ul>
-          <Link href="/admin?tab=articles">
+          <Link href="/admin">
             <li
               className={`p-3 hover:bg-gray-500 ${
-                router.query.tab === "articles" && "bg-gray-700"
+                selected === "articles" && "bg-gray-700"
               }`}
             >
               Articles
             </li>
           </Link>
-          <Link href="/admin?tab=profile">
+          <Link href="/admin/pages">
             <li
               className={`p-3 hover:bg-gray-500 ${
-                router.query.tab === "profile" && "bg-gray-700"
+                selected === "pages" && "bg-gray-700"
               }`}
             >
-              Profile
+              Pages
             </li>
           </Link>
           <button

@@ -22,3 +22,12 @@ model Articles {
   openGraphTitle       String?
   openGraphDescription String?
 }
+
+model PagesContent {
+  id         String   @id @map("_id")
+  title      String
+  slug       String   @unique
+  mdxContent String
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+}

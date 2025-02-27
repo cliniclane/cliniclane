@@ -1,59 +1,34 @@
 import Sidebar from "@/components/Admin/Sidebar";
-import { Articles as IArticles } from "@prisma/client";
+import { PagesContent } from "@prisma/client";
 import Link from "next/link";
-import { useEffect, useState } from "react";
-import toast from "react-hot-toast";
+import React, { useEffect, useState } from "react";
 import { FaEdit } from "react-icons/fa";
-import { MdDeleteForever } from "react-icons/md";
 
-export default function Articles() {
-  const [articles, setArticles] = useState<IArticles[]>([]);
-
-  // Delete Article
-  const deleteArticle = async (id: string) => {
-    const url = `${process.env.NEXT_PUBLIC_NEXTAUTH_URL}/api/article?id=${id}`;
-    console.log(url);
-    const res = await fetch(url, {
-      method: "DELETE",
-    });
-
-    if (res.ok) {
-      toast.success("Article deleted successfully");
-      const newArticles = articles.filter((article) => article.id !== id);
-      setArticles(newArticles);
-    } else {
-      toast.error("Failed to delete article");
-    }
-  };
+const Pages = () => {
+  const [pages, setPages] = useState<PagesContent[]>([]);
 
   // Fetch articles
   useEffect(() => {
-    const fetchArticles = async () => {
-      const res = await fetch("/api/article/all");
+    const fetchPages = async () => {
+      const res = await fetch("/api/pageContent/all");
       const data = await res.json();
-      setArticles(data);
+      setPages(data);
     };
 
-    fetchArticles();
+    fetchPages();
   }, []);
 
   return (
     <div className="flex flex-col md:flex-row">
       {/* Sidebar */}
-      <Sidebar selected="articles" />
+      <Sidebar selected="pages" />
 
       {/* Content */}
       <div className="md:pl-72 py-10 px-4 sm:px-6 mt-10 md:mt-0 w-full">
         <div className="flex w-full justify-between">
           <span className="text-2xl font-medium underline text-gray-500">
-            All Articles
+            All Pages
           </span>
-          <Link
-            href="/admin/article/new?tab=basic"
-            className="bg-blue-500 px-5 py-2 text-white rounded-md"
-          >
-            New Article
-          </Link>
         </div>
 
         {/* Responsive Table */}
@@ -71,7 +46,7 @@ export default function Articles() {
                   Title
                 </th>
                 <th scope="col" className="px-4 py-3">
-                  Publish Date
+                  Last Updated
                 </th>
                 <th scope="col" className="px-4 py-3">
                   Action
@@ -79,30 +54,24 @@ export default function Articles() {
               </tr>
             </thead>
             <tbody>
-              {articles.map((article, index) => (
+              {pages.map((page, index) => (
                 <tr
-                  key={article.id}
+                  key={page.id}
                   className="bg-white border-b border-gray-200 hover:bg-gray-50"
                 >
                   <td className="px-2 py-4">{index + 1}.</td>
-                  <td className="px-4 py-4">{article.slug}</td>
-                  <td className="px-4 py-4">{article.title}</td>
+                  <td className="px-4 py-4">{page.slug}</td>
+                  <td className="px-4 py-4">{page.title}</td>
                   <td className="px-4 py-4">
-                    {new Date(article.publishDate).toDateString()}
+                    {new Date(page.updatedAt).toDateString()}
                   </td>
-                  <td className="px-4 py-4 flex gap-4">
+                  <td className="px-4 py-4 flex">
                     <Link
-                      href={`/admin/article/edit/${article.id}?tab=basic`}
+                      href={`/admin/pages/edit/${page.slug}`}
                       className="text-xl"
                     >
                       <FaEdit />
                     </Link>
-                    <button
-                      onClick={() => deleteArticle(article.id)}
-                      className="text-2xl text-red-600"
-                    >
-                      <MdDeleteForever />
-                    </button>
                   </td>
                 </tr>
               ))}
@@ -112,4 +81,6 @@ export default function Articles() {
       </div>
     </div>
   );
-}
+};
+
+export default Pages;

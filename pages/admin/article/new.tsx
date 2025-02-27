@@ -103,7 +103,7 @@ const NewArticle = () => {
 
   return (
     <div className="flex">
-      <Sidebar />
+      <Sidebar selected="articles" />
       <div className="md:pl-52 flex mt-16 md:mt-0 flex-col w-full">
         {/* Tabs */}
         <div className="font-medium w-full text-center text-gray-500 border-b border-gray-200 md:px-20">
