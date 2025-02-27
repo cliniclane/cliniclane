@@ -115,7 +115,6 @@ export default function Home({ articles }: { articles: Articles[] }) {
 }
 
 export async function getStaticProps() {
-  // Call an external API endpoint to get posts
   const res = await fetch(
     process.env.NEXT_PUBLIC_NEXTAUTH_URL + "/api/article/all",
     {

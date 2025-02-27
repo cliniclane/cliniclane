@@ -1,5 +1,6 @@
 import { Articles } from "@prisma/client";
 import Image from "next/image";
+import Link from "next/link";
 import { useRouter } from "next/router";
 import { FC } from "react";
 
@@ -21,9 +22,12 @@ const MostPopular: FC<IProps> = ({ articles }) => {
             less fuss
           </p>
         </div>
-        <button className="bg-black text-white px-6 py-2 rounded-full text-sm hover:bg-gray-800">
+        <Link
+          href="/all"
+          className="bg-black text-white px-6 py-2 rounded-full text-sm hover:bg-gray-800"
+        >
           Read All Articles
-        </button>
+        </Link>
       </div>
 
       {/* Articles Grid */}
