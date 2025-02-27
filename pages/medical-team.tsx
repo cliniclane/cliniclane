@@ -1,13 +1,13 @@
 import Footer from "@/components/Footer";
+import MDXRenderer from "@/components/MDXRenderer";
 import Navbar from "@/components/Navbar";
 import { PagesContent, PrismaClient } from "@prisma/client";
 import { GetStaticProps } from "next";
 import { MDXRemoteSerializeResult } from "next-mdx-remote";
-import { useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { serialize } from "next-mdx-remote/serialize";
-import MDXRenderer from "@/components/MDXRenderer";
 
-const About = ({ pageData }: { pageData: PagesContent }) => {
+export default function Privacy({ pageData }: { pageData: PagesContent }) {
   const [mdxContent, setMdxContent] = useState<MDXRemoteSerializeResult<
     Record<string, unknown>,
     Record<string, unknown>
@@ -26,9 +26,11 @@ const About = ({ pageData }: { pageData: PagesContent }) => {
        * Navbar
        */}
       <Navbar />
-      {/* Content */}
-      <main className="flex flex-col md:px-14 xl:px-20">
-        <div className="flex flex-col gap-4">
+      {/*
+       * Content
+       */}
+      <main className="flex flex-col md:px-6 xl:px-14">
+        <div className="flex flex-col gap-4 p-5">
           {/* <h1 className="text-3xl font-semibold">{pageData.title}</h1> */}
           {mdxContent ? (
             <MDXRenderer source={mdxContent} />
@@ -43,15 +45,13 @@ const About = ({ pageData }: { pageData: PagesContent }) => {
       <Footer />
     </div>
   );
-};
-
-export default About;
+}
 
 export const getStaticProps: GetStaticProps = async () => {
   const prisma = new PrismaClient();
 
   const pageData = await prisma.pagesContent.findUnique({
-    where: { slug: "about" },
+    where: { slug: "medical-team" },
   });
 
   if (!pageData) {

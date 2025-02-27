@@ -2,7 +2,7 @@ import Footer from "@/components/Footer";
 import MostPopular from "@/components/MostPopular";
 import Navbar from "@/components/Navbar";
 import Newsletter from "@/components/Newsletter";
-import { Articles } from "@prisma/client";
+import { Articles, PrismaClient } from "@prisma/client";
 import Image from "next/image";
 import Link from "next/link";
 
@@ -115,20 +115,20 @@ export default function Home({ articles }: { articles: Articles[] }) {
 }
 
 export async function getStaticProps() {
-  const res = await fetch(
-    process.env.NEXT_PUBLIC_NEXTAUTH_URL + "/api/article/all",
-    {
-      method: "GET",
-      headers: {
-        "Content-Type": "application/json",
-      },
-    }
-  );
-  const articles = await res.json();
+  const prisma = new PrismaClient();
+
+  const articles = await prisma.articles.findMany({
+    orderBy: { publishDate: "desc" },
+  });
+
+  if (!articles) {
+    return { notFound: true }; // Return 404 if page not found
+  }
 
   return {
     props: {
       articles,
     },
+    revalidate: 10000,
   };
 }

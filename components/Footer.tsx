@@ -30,7 +30,7 @@ const linksData = [
   },
   {
     name: "Medical Affairs",
-    slug: "medical",
+    slug: "medical-team",
   },
 ];
 
