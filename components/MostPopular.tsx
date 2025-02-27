@@ -1,6 +1,14 @@
+import { Articles } from "@prisma/client";
 import Image from "next/image";
+import { useRouter } from "next/router";
+import { FC } from "react";
 
-const MostPopular = () => {
+interface IProps {
+  articles: Articles[];
+}
+
+const MostPopular: FC<IProps> = ({ articles }) => {
+  const router = useRouter();
   return (
     <section className="bg-purple-200 p-8 rounded-xl">
       <div className="flex justify-between items-center mb-6">
@@ -19,27 +27,18 @@ const MostPopular = () => {
       </div>
 
       {/* Articles Grid */}
-      <div className="grid md:grid-cols-3 gap-6">
-        {[
-          {
-            src: "https://images.unsplash.com/photo-1716802043669-8aabd339dc00?q=80&w=2680&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
-            title: "CREATORS",
-          },
-          {
-            src: "https://images.unsplash.com/photo-1554244933-d876deb6b2ff?q=80&w=2680&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
-            title: "CREATORS",
-          },
-          {
-            src: "https://images.unsplash.com/photo-1454944338482-a69bb95894af?q=80&w=2673&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
-            title: "CREATORS",
-          },
-        ].map((article, index) => (
-          <div key={index} className="relative rounded-xl overflow-hidden">
+      <div className="grid md:grid-cols-3 gap-6 grid-rows-1 h-80">
+        {articles.map((article, index) => (
+          <div
+            onClick={() => router.push(`/[slug]`, `/${article.slug}`)}
+            key={index}
+            className="relative rounded-xl overflow-hidden cursor-pointer"
+          >
             <Image
-              src={article.src}
+              src={article.headerImage}
               alt={article.title}
               width={400}
-              height={300}
+              height={400}
               className="w-full h-full object-cover"
             />
             <div className="absolute bottom-3 left-3 bg-black bg-opacity-50 text-white text-xs px-2 py-1 rounded">
