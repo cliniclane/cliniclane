@@ -26,7 +26,7 @@ const linksData = [
   },
   {
     name: "Sitemap",
-    slug: "sitemap",
+    slug: "sitemap-0.xml",
   },
   {
     name: "Medical Affairs",
