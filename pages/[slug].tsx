@@ -191,7 +191,7 @@ const Article = ({ articleData }: ArticleProps) => {
 };
 
 export const getStaticPaths: GetStaticPaths = async () => {
-  const url = `${process.env.NEXT_PUBLIC_NEXTAUTH_URL}/api/articles`; // Assuming an API that returns all slugs
+  const url = `${process.env.NEXT_PUBLIC_NEXTAUTH_URL}/api/article/all`; // Assuming an API that returns all slugs
 
   const res = await fetch(url);
   const articles: Articles[] = await res.json();
