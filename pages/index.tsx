@@ -45,7 +45,7 @@ export default function Home({ articles }: { articles: Articles[] }) {
             </Link>
             {/* Smaller Cards */}
             <Link
-              href="/crohns-disease"
+              href={"/" + articles[1].slug}
               className="relative hover:opacity-90 cursor-pointer rounded-xl overflow-hidden"
             >
               <Image
