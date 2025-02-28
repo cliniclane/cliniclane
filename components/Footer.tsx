@@ -78,15 +78,28 @@ export default function Footer() {
 
         {/* Middle Section: Links */}
         <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4 text-sm">
-          {linksData.map((link, index) => (
-            <Link
-              href={"/" + link.slug}
-              key={index}
-              className="hover:underline"
-            >
-              {link.name}
-            </Link>
-          ))}
+          {linksData.map((link, index) => {
+            if (link.name === "Sitemap")
+              return (
+                <button
+                  key={index}
+                  onClick={() => window.location.replace("/" + link.slug)}
+                  className="hover:underline"
+                >
+                  {link.name}
+                </button>
+              );
+            else
+              return (
+                <Link
+                  href={"/" + link.slug}
+                  key={index}
+                  className="hover:underline"
+                >
+                  {link.name}
+                </Link>
+              );
+          })}
         </div>
 
         {/* Bottom Section: Copyright */}
