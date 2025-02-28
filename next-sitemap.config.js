@@ -27,7 +27,7 @@ module.exports = {
             lastmod: new Date().toISOString(),
         };
     },
-    sitemapSize: 5000,
+    sitemapSize: 500000,
     exclude: ['/admin', "/admin/article/new", "/admin/login", "/admin/pages"], // Exclude specific pages
     robotsTxtOptions: {
         policies: [
