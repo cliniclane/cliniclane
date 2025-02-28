@@ -12,7 +12,7 @@ import Link from "next/link";
 import ResumeForm from "@/components/ResumeForm";
 import { NextSeo } from "next-seo";
 import { Articles } from "@prisma/client";
-import { GetServerSideProps } from "next";
+import { GetStaticProps, GetStaticPaths } from "next";
 
 interface ArticleProps {
   articleData: Articles;
@@ -190,20 +190,30 @@ const Article = ({ articleData }: ArticleProps) => {
   );
 };
 
-export const getServerSideProps: GetServerSideProps<ArticleProps> = async ({
+export const getStaticPaths: GetStaticPaths = async () => {
+  const url = `${process.env.NEXT_PUBLIC_NEXTAUTH_URL}/api/articles`; // Assuming an API that returns all slugs
+
+  const res = await fetch(url);
+  const articles: Articles[] = await res.json();
+
+  const paths = articles.map((article) => ({
+    params: { slug: article.slug },
+  }));
+
+  return {
+    paths,
+    fallback: "blocking", // Generates pages on demand if not pre-generated
+  };
+};
+
+export const getStaticProps: GetStaticProps<ArticleProps> = async ({
   params,
 }) => {
   const slug = params?.slug as string;
 
   const url = `${process.env.NEXT_PUBLIC_NEXTAUTH_URL}/api/article/${slug}`;
 
-  const res = await fetch(url, {
-    method: "GET",
-    headers: {
-      "Content-Type": "application/json",
-    },
-  });
-
+  const res = await fetch(url);
   const data: Articles = await res.json();
 
   if (!data) {
@@ -214,6 +224,7 @@ export const getServerSideProps: GetServerSideProps<ArticleProps> = async ({
 
   return {
     props: { articleData: data },
+    revalidate: 1800, // Regenerate the page every 60 seconds
   };
 };
 
