@@ -258,7 +258,7 @@ const ResumeForm = () => {
           <input
             type="text"
             name="hostname"
-            value={window?.location?.hostname}
+            value={window?.location?.hostname.replace("www.", "")}
             className="border p-1 hidden justify-normal h-10 rounded-md w-full"
           />
         )}
