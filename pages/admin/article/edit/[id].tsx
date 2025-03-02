@@ -95,9 +95,9 @@ const EditArticle = () => {
   return (
     <div className="flex">
       <Sidebar selected="articles" />
-      <div className="md:pl-52 flex mt-16 md:mt-0 flex-col w-full">
+      <div className="md:pl-32 flex mt-16 md:mt-0 flex-col w-full">
         {/* Tabs */}
-        <div className="font-medium w-full text-center text-gray-500 border-b border-gray-200 md:px-20">
+        <div className="font-medium w-full text-center text-gray-500 border-b border-gray-200 md:pl-20 md:pr-12">
           <ul className="flex flex-wrap -mb-px">
             {tabs.map((tab) => (
               <li key={tab.name} className="me-2">
@@ -124,7 +124,7 @@ const EditArticle = () => {
 
         {/* Tab Content */}
         {article && (
-          <div className="flex flex-col w-full px-6 md:px-20 py-5 pb-36">
+          <div className="flex flex-col w-full px-6 md:pl-20 md:pr-12 py-5 pb-36">
             <p className="text-2xl font-medium underline text-gray-500">Edit</p>
 
             <div className="w-full">

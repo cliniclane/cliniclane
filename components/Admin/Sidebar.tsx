@@ -1,4 +1,5 @@
 import { signOut } from "next-auth/react";
+import Image from "next/image";
 import Link from "next/link";
 import React, { FC, useEffect, useState } from "react";
 import { FaBars, FaTimes } from "react-icons/fa";
@@ -23,7 +24,7 @@ const Sidebar: FC<IProps> = ({ selected }) => {
   return (
     <div className="flex">
       <div
-        className={`fixed top-0 left-0 h-full bg-gray-800 text-white w-64 transition-transform duration-300 ease-in-out 
+        className={`fixed top-0 left-0 h-full bg-gray-800 text-white w-40 transition-transform duration-300 ease-in-out 
      ${
        isMobile
          ? isOpen
@@ -33,7 +34,14 @@ const Sidebar: FC<IProps> = ({ selected }) => {
      }`}
       >
         <div className="p-5 text-lg font-bold flex justify-between items-center">
-          <span>Admin Dashboard </span>
+          <div className="w-full flex items-center justify-center mb-3">
+            <Image
+              src="/android-chrome-192x192.png"
+              alt="Logo"
+              width={40}
+              height={40}
+            />
+          </div>
           {isMobile && (
             <button onClick={() => setIsOpen(false)} className="text-white">
               <FaTimes size={20} />
@@ -43,7 +51,7 @@ const Sidebar: FC<IProps> = ({ selected }) => {
         <ul>
           <Link href="/admin">
             <li
-              className={`p-3 hover:bg-gray-500 ${
+              className={`p-5 hover:bg-gray-500 ${
                 selected === "articles" && "bg-gray-700"
               }`}
             >
@@ -52,7 +60,7 @@ const Sidebar: FC<IProps> = ({ selected }) => {
           </Link>
           <Link href="/admin/pages">
             <li
-              className={`p-3 hover:bg-gray-500 ${
+              className={`p-5 hover:bg-gray-500 ${
                 selected === "pages" && "bg-gray-700"
               }`}
             >
@@ -61,9 +69,9 @@ const Sidebar: FC<IProps> = ({ selected }) => {
           </Link>
           <button
             onClick={() => signOut()}
-            className="absolute bottom-10 mx-auto w-full ml-3"
+            className="absolute bottom-10 mx-auto w-full ml-5"
           >
-            <TbLogout2 size={24} />
+            <TbLogout2 size={26} />
           </button>
         </ul>
       </div>

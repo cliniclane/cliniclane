@@ -24,7 +24,7 @@ const Pages = () => {
       <Sidebar selected="pages" />
 
       {/* Content */}
-      <div className="md:pl-72 py-10 px-4 sm:px-6 mt-10 md:mt-0 w-full">
+      <div className="md:pl-48 py-10 px-4 sm:px-6 mt-10 md:mt-0 w-full">
         <div className="flex w-full justify-between">
           <span className="text-2xl font-medium underline text-gray-500">
             All Pages

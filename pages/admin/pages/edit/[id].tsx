@@ -77,10 +77,10 @@ const EditPages = () => {
   return (
     <div className="flex">
       <Sidebar selected="pages" />
-      <div className="md:pl-52 flex mt-16 md:mt-0 flex-col w-full">
+      <div className="md:pl-32 flex mt-16 md:mt-0 flex-col w-full">
         {/* Tab Content */}
         {pageData ? (
-          <div className="flex flex-col w-full px-6 md:px-20 py-5 pb-36">
+          <div className="flex flex-col w-full px-6 md:pl-20 md:pr-12 py-5 pb-36">
             <p className="text-2xl font-medium underline text-gray-500">Edit</p>
 
             <div className="w-full">
