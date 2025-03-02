@@ -1,7 +1,6 @@
 import { Articles } from "@prisma/client";
 import Image from "next/image";
 import Link from "next/link";
-import { useRouter } from "next/router";
 import { FC } from "react";
 
 interface IProps {
@@ -9,7 +8,6 @@ interface IProps {
 }
 
 const MostPopular: FC<IProps> = ({ articles }) => {
-  const router = useRouter();
   return (
     <section className="bg-purple-200 p-8 rounded-xl">
       <div className="flex justify-between items-center mb-6">
@@ -33,8 +31,8 @@ const MostPopular: FC<IProps> = ({ articles }) => {
       {/* Articles Grid */}
       <div className="grid md:grid-cols-3 gap-6 grid-rows-1 h-80">
         {articles.map((article, index) => (
-          <div
-            onClick={() => router.push(`/[slug]`, `/${article.slug}`)}
+          <Link
+            href={`/${article.slug}`}
             key={index}
             className="relative hover:opacity-80 rounded-xl overflow-hidden cursor-pointer"
           >
@@ -48,7 +46,7 @@ const MostPopular: FC<IProps> = ({ articles }) => {
             <div className="absolute bottom-3 left-3 bg-black bg-opacity-50 text-white text-xs px-2 py-1 rounded">
               {article.title}
             </div>
-          </div>
+          </Link>
         ))}
       </div>
     </section>
