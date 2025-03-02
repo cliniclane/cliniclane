@@ -1,6 +1,7 @@
-import React, { FC } from "react";
+import React, { FC, useEffect, useState } from "react";
 import MdxEditor from "./MDXEditor";
 import { PagesContent } from "@prisma/client";
+import { getCookie } from "cookies-next";
 
 interface IProps {
   pageData: PagesContent;
@@ -21,6 +22,12 @@ const PageEditForm: FC<IProps> = ({
   handleSave,
   loading,
 }) => {
+  const [theme, setTheme] = useState("github");
+
+  useEffect(() => {
+    const c = getCookie("editor-theme");
+    if (c) setTheme(c as string);
+  }, []);
   return (
     <div className="w-full pt-10">
       <div className="mb-6">
@@ -66,7 +73,12 @@ const PageEditForm: FC<IProps> = ({
         >
           Content
         </label>
-        <MdxEditor value={mdxString} setValue={setMdxString} />
+        <MdxEditor
+          setTheme={setTheme}
+          theme={theme}
+          value={mdxString}
+          setValue={setMdxString}
+        />
       </div>
 
       <button
