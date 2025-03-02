@@ -34,7 +34,7 @@ const BasicEditForm: FC<IProps> = ({
       <div className="mb-6">
         <label
           htmlFor="title"
-          className="block mb-2 text-lg font-semibold text-gray-900 dark:text-white"
+          className="block mb-2 text-lg font-semibold text-gray-900"
         >
           Title
         </label>
@@ -51,7 +51,7 @@ const BasicEditForm: FC<IProps> = ({
       <div className="mb-6">
         <label
           htmlFor="slug"
-          className="block mb-2 text-lg font-semibold text-gray-900 dark:text-white"
+          className="block mb-2 text-lg font-semibold text-gray-900 "
         >
           Slug
         </label>
@@ -59,7 +59,7 @@ const BasicEditForm: FC<IProps> = ({
           type="text"
           id="slug"
           name="slug"
-          className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+          className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 "
           placeholder=""
           value={article?.slug || ""}
           onChange={handleChange}
@@ -68,7 +68,7 @@ const BasicEditForm: FC<IProps> = ({
       <div className="mb-6">
         <label
           htmlFor="description"
-          className="block mb-2 text-lg font-semibold text-gray-900 dark:text-white"
+          className="block mb-2 text-lg font-semibold text-gray-900 "
         >
           Description
         </label>
@@ -79,13 +79,13 @@ const BasicEditForm: FC<IProps> = ({
           rows={4}
           value={article?.description || ""}
           onChange={handleChange}
-          className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+          className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 "
         />
       </div>
       <div className="mb-6">
         <label
           htmlFor="headerImage"
-          className="block mb-2 text-lg font-semibold text-gray-900 dark:text-white"
+          className="block mb-2 text-lg font-semibold text-gray-900 "
         >
           Image
         </label>
@@ -95,13 +95,13 @@ const BasicEditForm: FC<IProps> = ({
           name="headerImage"
           onChange={handleChange}
           value={article?.headerImage}
-          className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+          className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 :bg-gray-700"
         />
       </div>
-      <div className="mb-6 h-[110vh]">
+      <div className="mb-6 mt-16 h-[110vh]">
         <label
           htmlFor="content"
-          className="block mb-2 text-lg font-semibold text-gray-900 dark:text-white"
+          className="block mb-4 text-lg font-semibold text-gray-900"
         >
           Content
         </label>

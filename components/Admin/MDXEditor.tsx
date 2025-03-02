@@ -55,7 +55,7 @@ const MdxEditor: FC<IProps> = ({ value, setValue, theme, setTheme }) => {
     loadMDX();
   }, [value]);
   return (
-    <div className="flex flex-col gap-4 p-4">
+    <div className="flex flex-col gap-4">
       <ul className="flex relative flex-wrap text-sm font-medium text-center text-gray-500 border-b border-gray-200 dark:border-gray-700 dark:text-gray-400">
         <li className="me-2">
           <button
