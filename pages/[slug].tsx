@@ -163,7 +163,10 @@ const Article = ({ articleData }: ArticleProps) => {
       {/*
        * Form
        */}
-      <div className="flex flex-col justify-center py-10 items-center bg-gray-100 p-5  md:px-14 xl:px-20">
+      <div
+        id="career"
+        className="flex flex-col justify-center py-10 items-center bg-gray-100 p-5  md:px-14 xl:px-20"
+      >
         <ResumeForm />
         <button
           onClick={() => {

@@ -3,6 +3,9 @@ import Link from "next/link";
 import { FaSearch } from "react-icons/fa";
 
 export default function Navbar() {
+  const scrollToResumeForm = () => {
+    document.getElementById("career")?.scrollIntoView({ behavior: "smooth" });
+  };
   return (
     <nav className="m-4 px-10 xl:px-[65px] py-4 flex items-center justify-between rounded-lg">
       {/* Logo */}
@@ -25,9 +28,12 @@ export default function Navbar() {
         <Link href="/about" className="hover:text-gray-500 text-lg">
           About
         </Link>
-        <a href="#career" className="hover:text-gray-500 text-lg">
+        <button
+          onClick={scrollToResumeForm}
+          className="hover:text-gray-500 text-lg"
+        >
           Career
-        </a>
+        </button>
       </div>
 
       {/* Search Icon and Button */}
