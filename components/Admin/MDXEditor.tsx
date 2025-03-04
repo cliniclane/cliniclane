@@ -122,8 +122,9 @@ const MdxEditor: FC<IProps> = ({ value, setValue, theme, setTheme }) => {
       <div className="w-full h-[700px] border rounded-md">
         {!isViewTab ? (
           <AceEditor
-            mode="markdown"
+            mode={isRtlContent ? "text" : "markdown"} // Ensure correct mode
             theme={theme}
+            key={isRtlContent ? "rtl" : "ltr"} // Force re-render
             value={value}
             onChange={(newValue) => setValue(newValue)}
             fontSize={13}
