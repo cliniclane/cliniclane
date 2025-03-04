@@ -11,8 +11,8 @@ export const authOptions = {
       },
       async authorize(credentials) {
         if (
-          credentials?.email === "cliniclane16@gmail.com" &&
-          credentials.password === "Rajan@220"
+          credentials?.email === "admin@cliniclane.com" &&
+          credentials.password === "#cliniclane2024"
         ) {
           return {
             id: "1", // Required field for NextAuth
