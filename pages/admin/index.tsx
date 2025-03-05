@@ -25,6 +25,7 @@ export default function Articles() {
     const url = `${process.env.NEXT_PUBLIC_NEXTAUTH_URL}/api/article?id=${id}`;
     const promise = fetch(url, {
       method: "DELETE",
+      headers: { "Content-Type": "application/json" },
     });
     toast.promise(promise, {
       loading: "Deleting...",
