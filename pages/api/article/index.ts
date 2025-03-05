@@ -10,7 +10,7 @@ export default async function handler(
   if (req.method === "GET") {
     const { id } = req.query;
     if (!id) {
-      return res.status(400).json({ error: "Missing required parameter" });
+      res.status(400).json({ error: "Missing required parameter" });
     }
 
     try {
@@ -27,7 +27,7 @@ export default async function handler(
     const { id, ...updateData } = req.body;
 
     if (!id) {
-      return res.status(400).json({ error: "ID is required" });
+      res.status(400).json({ error: "ID is required" });
     }
     try {
       const article = await prisma.articles.update({
@@ -56,7 +56,7 @@ export default async function handler(
   } else if (req.method === "DELETE") {
     const { id } = req.query;
     if (!id) {
-      return res.status(400).json({ error: "ID is required" });
+      res.status(400).json({ error: "ID is required" });
     }
     try {
       const article = await prisma.articles.delete({
