@@ -5,6 +5,17 @@ import { useEffect, useState } from "react";
 import toast from "react-hot-toast";
 import { FaEdit } from "react-icons/fa";
 import { MdDeleteForever } from "react-icons/md";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
 
 export default function Articles() {
   const [articles, setArticles] = useState<IArticles[]>([]);
@@ -12,18 +23,18 @@ export default function Articles() {
   // Delete Article
   const deleteArticle = async (id: string) => {
     const url = `${process.env.NEXT_PUBLIC_NEXTAUTH_URL}/api/article?id=${id}`;
-    console.log(url);
-    const res = await fetch(url, {
+    const promise = fetch(url, {
       method: "DELETE",
     });
-
-    if (res.ok) {
-      toast.success("Article deleted successfully");
-      const newArticles = articles.filter((article) => article.id !== id);
-      setArticles(newArticles);
-    } else {
-      toast.error("Failed to delete article");
-    }
+    toast.promise(promise, {
+      loading: "Deleting...",
+      success: () => {
+        const newArticles = articles.filter((article) => article.id !== id);
+        setArticles(newArticles);
+        return "Article deleted successfully";
+      },
+      error: "Failed to delete article",
+    });
   };
 
   // Fetch articles
@@ -97,12 +108,32 @@ export default function Articles() {
                     >
                       <FaEdit />
                     </Link>
-                    <button
-                      onClick={() => deleteArticle(article.id)}
-                      className="text-2xl text-red-600"
-                    >
-                      <MdDeleteForever />
-                    </button>
+
+                    <AlertDialog>
+                      <AlertDialogTrigger>
+                        <MdDeleteForever className="text-2xl text-red-600" />
+                      </AlertDialogTrigger>
+                      <AlertDialogContent>
+                        <AlertDialogHeader>
+                          <AlertDialogTitle>
+                            Do you want to delete this article
+                          </AlertDialogTitle>
+                          <AlertDialogDescription>
+                            This action cannot be undone. This will permanently
+                            delete your account and remove your data from our
+                            servers.
+                          </AlertDialogDescription>
+                        </AlertDialogHeader>
+                        <AlertDialogFooter>
+                          <AlertDialogCancel>Cancel</AlertDialogCancel>
+                          <AlertDialogAction
+                            onClick={() => deleteArticle(article.id)}
+                          >
+                            Continue
+                          </AlertDialogAction>
+                        </AlertDialogFooter>
+                      </AlertDialogContent>
+                    </AlertDialog>
                   </td>
                 </tr>
               ))}
