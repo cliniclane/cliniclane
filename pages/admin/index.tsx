@@ -33,7 +33,10 @@ export default function Articles() {
         setArticles(newArticles);
         return "Article deleted successfully";
       },
-      error: "Failed to delete article",
+      error: (res) => {
+        console.log(res);
+        return "Failed to delete article";
+      },
     });
   };
 
