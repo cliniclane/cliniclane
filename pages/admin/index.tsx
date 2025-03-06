@@ -22,10 +22,11 @@ export default function Articles() {
 
   // Delete Article
   const deleteArticle = async (id: string) => {
-    const url = `${process.env.NEXT_PUBLIC_NEXTAUTH_URL}/api/article?id=${id}`;
+    const url = `${process.env.NEXT_PUBLIC_NEXTAUTH_URL}/api/article/delete`;
     const promise = fetch(url, {
       method: "DELETE",
       headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ id }),
     });
     toast.promise(promise, {
       loading: "Deleting...",
