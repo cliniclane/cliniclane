@@ -2,7 +2,7 @@ import Sidebar from "@/components/Admin/Sidebar";
 import { Articles as IArticles } from "@prisma/client";
 import Link from "next/link";
 import { useEffect, useState } from "react";
-import toast from "react-hot-toast";
+// import toast from "react-hot-toast";
 import { FaEdit } from "react-icons/fa";
 import { MdDeleteForever } from "react-icons/md";
 import {
@@ -22,24 +22,40 @@ export default function Articles() {
 
   // Delete Article
   const deleteArticle = async (id: string) => {
-    const url = `${process.env.NEXT_PUBLIC_NEXTAUTH_URL}/api/article/delete`;
-    const promise = fetch(url, {
+    fetch(process.env.NEXT_PUBLIC_NEXTAUTH_URL + "/api/deleteArticle", {
       method: "DELETE",
-      headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ id }),
-    });
-    toast.promise(promise, {
-      loading: "Deleting...",
-      success: () => {
+      headers: {
+        "Content-Type": "application/json",
+      },
+    })
+      .then(async (response) => {
+        const data = await response.json(); // Get detailed error message
+        console.log("Response Data:", data);
         const newArticles = articles.filter((article) => article.id !== id);
         setArticles(newArticles);
-        return "Article deleted successfully";
-      },
-      error: (res) => {
-        console.log(res);
-        return "Failed to delete article";
-      },
-    });
+        if (!response.ok) throw new Error(data.error || "Something went wrong");
+      })
+      .catch((error) => console.error("API Error:", error.message));
+
+    // const url = `${process.env.NEXT_PUBLIC_NEXTAUTH_URL}/api/article/delete`;
+    // const promise = fetch(url, {
+    //   method: "DELETE",
+    //   headers: { "Content-Type": "application/json" },
+    //   body: JSON.stringify({ id }),
+    // });
+    // toast.promise(promise, {
+    //   loading: "Deleting...",
+    //   success: () => {
+    //     const newArticles = articles.filter((article) => article.id !== id);
+    //     setArticles(newArticles);
+    //     return "Article deleted successfully";
+    //   },
+    //   error: (res) => {
+    //     console.log(res);
+    //     return "Failed to delete article";
+    //   },
+    // });
   };
 
   // Fetch articles
