@@ -22,7 +22,7 @@ export default function Articles() {
 
   // Delete Article
   const deleteArticle = async (id: string) => {
-    fetch(process.env.NEXT_PUBLIC_NEXTAUTH_URL + "/api/deleteArticle", {
+    fetch(process.env.NEXT_PUBLIC_NEXTAUTH_URL + "/api/article/delete", {
       method: "DELETE",
       body: JSON.stringify({ id }),
       headers: {
@@ -36,7 +36,7 @@ export default function Articles() {
         setArticles(newArticles);
         if (!response.ok) throw new Error(data.error || "Something went wrong");
       })
-      .catch((error) => console.error("API Error:", error.message));
+      .catch((error) => console.error(error));
 
     // const url = `${process.env.NEXT_PUBLIC_NEXTAUTH_URL}/api/article/delete`;
     // const promise = fetch(url, {
