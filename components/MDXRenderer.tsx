@@ -36,15 +36,15 @@ const MDXRenderer: React.FC<MDXRendererProps> = ({ source }) => {
           {...source}
           components={{
             h1: ({ children }) => {
-              const id = (children as string)
-                ?.toLowerCase()
-                ?.replace(/\s+/g, "-");
+              let id = children as string;
+              if (typeof id === "string")
+                id = id.toLowerCase().replace(/\s+/g, "-");
               const dir = isRTL(children as string) ? "rtl" : "ltr";
               return (
                 <h1
                   id={id}
                   dir={dir}
-                  className="text-3xl font-semibold my-10 scroll-mt-20"
+                  className={`text-3xl font-semibold my-10 scroll-mt-20 rtl:text-right`}
                 >
                   {children}
                 </h1>
@@ -67,6 +67,22 @@ const MDXRenderer: React.FC<MDXRendererProps> = ({ source }) => {
                 >
                   {children}
                 </ol>
+              );
+            },
+            strong: ({ children }) => {
+              const dir = isRTL(children as string) ? "rtl" : "ltr";
+              return (
+                <strong className="font-bold rtl:text-right text-gray-900" dir={dir}>
+                  {children}
+                </strong>
+              );
+            },
+            b: ({ children }) => {
+              const dir = isRTL(children as string) ? "rtl" : "ltr";
+              return (
+                <b className="font-semibold rtl:text-right text-gray-900" dir={dir}>
+                  {children}
+                </b>
               );
             },
           }}

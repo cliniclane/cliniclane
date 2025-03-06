@@ -22,7 +22,7 @@ import "ace-builds/src-noconflict/theme-gruvbox";
 const isRTL = (text: string) => {
   const rtlPattern =
     /[\u0600-\u06FF\u0750-\u077F\u08A0-\u08FF\uFB50-\uFDFF\uFE70-\uFEFF]/;
-  return rtlPattern.test(text);
+  return rtlPattern.test(text) && text.length > 0; // Ensure non-empty check
 };
 
 import MDXRenderer from "../MDXRenderer";
@@ -56,7 +56,7 @@ const MdxEditor: FC<IProps> = ({ value, setValue, theme, setTheme }) => {
   }, [value]);
   return (
     <div className="flex flex-col gap-4">
-      <ul className="flex relative flex-wrap text-sm font-medium text-center text-gray-500 border-b border-gray-200 dark:border-gray-700 dark:text-gray-400">
+      <ul className="flex relative flex-wrap text-sm font-medium text-center text-gray-500 border-b border-gray-200">
         <li className="me-2">
           <button
             onClick={() => setIsViewTab(false)}
@@ -122,7 +122,7 @@ const MdxEditor: FC<IProps> = ({ value, setValue, theme, setTheme }) => {
       <div className="w-full h-[700px] border rounded-md">
         {!isViewTab ? (
           <AceEditor
-            mode={isRtlContent ? "text" : "markdown"} // Ensure correct mode
+            mode={isRtlContent ? "text" : "markdown"}
             theme={theme}
             key={isRtlContent ? "rtl" : "ltr"} // Force re-render
             value={value}
@@ -133,13 +133,15 @@ const MdxEditor: FC<IProps> = ({ value, setValue, theme, setTheme }) => {
             setOptions={{
               useWorker: false,
               showPrintMargin: false,
-              wrap: true,
+              wrap: true, // Ensure text wrapping to prevent overflow
               firstLineNumber: 1,
             }}
             editorProps={{ $blockScrolling: true }}
             style={{
               direction: isRtlContent ? "rtl" : "ltr",
               textAlign: isRtlContent ? "right" : "left",
+              whiteSpace: "pre-wrap", // Ensure wrapping for long RTL words
+              overflow: "hidden", // Prevent text overflow
             }}
           />
         ) : (
