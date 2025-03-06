@@ -22,7 +22,7 @@ export default function Articles() {
 
   // Delete Article
   const deleteArticle = async (id: string) => {
-    fetch(process.env.NEXT_PUBLIC_NEXTAUTH_URL + "/api/article/delete", {
+    fetch("/api/article/delete", {
       method: "DELETE",
       body: JSON.stringify({ id }),
       headers: {
