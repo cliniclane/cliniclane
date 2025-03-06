@@ -16,27 +16,32 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
+import toast from "react-hot-toast";
 
 export default function Articles() {
   const [articles, setArticles] = useState<IArticles[]>([]);
 
   // Delete Article
   const deleteArticle = async (id: string) => {
-    fetch("/api/article/delete", {
+    const promise = fetch("/api/article/delete", {
       method: "DELETE",
       body: JSON.stringify({ id }),
       headers: {
         "Content-Type": "application/json",
       },
-    })
-      .then(async (response) => {
-        const data = await response.json(); // Get detailed error message
-        console.log("Response Data:", data);
+    });
+    toast.promise(promise, {
+      loading: "Deleting...",
+      success: () => {
         const newArticles = articles.filter((article) => article.id !== id);
         setArticles(newArticles);
-        if (!response.ok) throw new Error(data.error || "Something went wrong");
-      })
-      .catch((error) => console.error(error));
+        return "Article deleted successfully";
+      },
+      error: (res) => {
+        console.log(res);
+        return "Failed to delete article";
+      },
+    });
 
     // const url = `${process.env.NEXT_PUBLIC_NEXTAUTH_URL}/api/article/delete`;
     // const promise = fetch(url, {
