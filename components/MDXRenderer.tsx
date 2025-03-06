@@ -4,7 +4,8 @@ import React from "react";
 
 // Function to detect RTL content
 const isRTL = (text: string) => {
-  const rtlPattern = /[\u0600-\u06FF\u0750-\u077F\u08A0-\u08FF\uFB50-\uFDFF\uFE70-\uFEFF]/;
+  const rtlPattern =
+    /[\u0600-\u06FF\u0750-\u077F\u08A0-\u08FF\uFB50-\uFDFF\uFE70-\uFEFF]/;
   return rtlPattern.test(text);
 };
 
@@ -36,8 +37,8 @@ const MDXRenderer: React.FC<MDXRendererProps> = ({ source }) => {
           components={{
             h1: ({ children }) => {
               const id = (children as string)
-                .toLowerCase()
-                .replace(/\s+/g, "-");
+                ?.toLowerCase()
+                ?.replace(/\s+/g, "-");
               const dir = isRTL(children as string) ? "rtl" : "ltr";
               return (
                 <h1
@@ -60,7 +61,10 @@ const MDXRenderer: React.FC<MDXRendererProps> = ({ source }) => {
             ol: ({ children }) => {
               const dir = isRTL(children as string) ? "rtl" : "ltr";
               return (
-                <ol className="list-decimal text-lg text-gray-800 mb-2" dir={dir}>
+                <ol
+                  className="list-decimal text-lg text-gray-800 mb-2"
+                  dir={dir}
+                >
                   {children}
                 </ol>
               );
