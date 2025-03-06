@@ -24,15 +24,28 @@ export default async function handler(
       res.status(500).json({ error: "Failed to fetch articles" });
     }
   } else if (req.method === "PUT") {
-    const { id, ...updateData } = req.body;
+    const { id, slug, ...updateData } = req.body;
 
     if (!id) {
       res.status(400).json({ error: "ID is required" });
     }
+
+    // make slug from title
+    if (!slug) updateData.slug = updateData.title.split(" ").join("-");
+
+    // check if slug already exists
+    const existingArticle = await prisma.articles.findFirst({
+      where: { slug },
+    });
+    if (existingArticle) {
+      return res.status(400).json({ error: "Slug already exists" });
+    }
+
+    console.log(updateData);
     try {
       const article = await prisma.articles.update({
         where: { id },
-        data: updateData,
+        data: { ...updateData, slug },
       });
 
       res.status(201).json(article);
@@ -41,11 +54,23 @@ export default async function handler(
       res.status(500).json({ error: "Failed to create article" });
     }
   } else if (req.method === "POST") {
-    const { ...updateData } = req.body;
+    const { slug, ...updateData } = req.body;
 
+    // make slug from title
+    if (!slug) updateData.slug = updateData.title.split(" ").join("-");
+
+    // check if slug already exists
+    const existingArticle = await prisma.articles.findFirst({
+      where: { slug },
+    });
+    if (existingArticle) {
+      return res.status(400).json({ error: "Slug already exists" });
+    }
+
+    // create the article in the database
     try {
       const article = await prisma.articles.create({
-        data: updateData,
+        data: { ...updateData, slug },
       });
 
       res.status(201).json(article);

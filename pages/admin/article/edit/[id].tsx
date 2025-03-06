@@ -65,13 +65,15 @@ const EditArticle = () => {
 
     setLoading(false);
 
+    const data = await res.json();
+
     if (res.status === 201) {
       toast.success("Article updated successfully");
       setTimeout(() => {
         router.push("/admin");
       }, 400);
     } else {
-      toast.error("Failed to update article");
+      toast.error(data.error);
     }
   };
 
@@ -89,7 +91,8 @@ const EditArticle = () => {
 
   useEffect(() => {
     if (tab && !activeTab) setActiveTab(tab as string);
-    if (!router.query.tab && id) router.push(`/admin/article/edit/${id}?tab=basic`);
+    if (!router.query.tab && id)
+      router.push(`/admin/article/edit/${id}?tab=basic`);
   }, [tab, id]);
 
   return (
