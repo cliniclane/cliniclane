@@ -70,6 +70,11 @@ const NewArticle = () => {
 
     const newID = uuidv4();
 
+    if (article?.slug) {
+      toast.error("Slug is required");
+      return;
+    }
+
     const payload = {
       ...article,
       tags,
