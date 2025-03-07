@@ -24,7 +24,7 @@ export default function Home({ articles }: { articles: Articles[] }) {
           <div className="flex flex-col space-y-3 justify-between">
             {/* Smaller Cards */}
             <Link
-              href="/insomnia"
+              href={"/" + articles[2].slug}
               className="relative hover:opacity-90 cursor-pointer rounded-xl overflow-hidden"
             >
               <Image
@@ -67,7 +67,7 @@ export default function Home({ articles }: { articles: Articles[] }) {
           </div>
           {/* Large Main Card */}
           <Link
-            href="/rheumatoid-arthritis-disease-juvenile-symptoms-treatment"
+            href={"/" + articles[0].slug}
             className="md:col-span-2 hover:opacity-90 cursor-pointer relative rounded-xl overflow-hidden"
           >
             <Image

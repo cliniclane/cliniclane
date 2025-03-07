@@ -165,7 +165,7 @@ const Article = ({ articleData }: ArticleProps) => {
        */}
       <div
         id="career"
-        className="flex flex-col justify-center py-10 items-center bg-gray-100 p-5  md:px-14 xl:px-20"
+        className="flex flex-col justify-center py-16 items-center bg-gray-100 p-5  md:px-14 xl:px-20"
       >
         <ResumeForm />
         <button
@@ -178,9 +178,13 @@ const Article = ({ articleData }: ArticleProps) => {
         </button>
         {showAssessMent && (
           <iframe
-            src="https://talent-assessment.testgorilla.com/7c3d1852-a3f9-417e-8c76-c9e06097265c/welcome"
+            src={`${
+              process.env.NEXT_PUBLIC_TEST_URL
+            }/nx/view/page/${encodeURIComponent(
+              `${process.env.NEXT_PUBLIC_NEXTAUTH_URL}/${articleData.slug}`
+            )}`}
             width="100%"
-            height="100vh"
+            height="120vh"
             className="overflow-hidden h-screen"
           />
         )}
