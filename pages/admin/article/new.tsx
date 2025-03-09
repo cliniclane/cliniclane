@@ -70,8 +70,9 @@ const NewArticle = () => {
 
     const newID = uuidv4();
 
-    if (article?.slug) {
+    if (!article?.slug) {
       toast.error("Slug is required");
+      setLoading(false)
       return;
     }
 
@@ -97,6 +98,7 @@ const NewArticle = () => {
         router.push("/admin");
       }, 400);
     } else {
+      console.log(res)
       toast.error("Failed to create article");
     }
   };
