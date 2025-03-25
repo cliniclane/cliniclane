@@ -38,7 +38,9 @@ export default async function handler(
       where: { slug },
     });
     if (existingArticle) {
-      return res.status(400).json({ error: "Slug already exists" });
+      if (existingArticle.id !== id) {
+        return res.status(400).json({ error: "Slug already exists" });
+      }
     }
 
     console.log(updateData);

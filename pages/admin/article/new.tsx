@@ -72,7 +72,7 @@ const NewArticle = () => {
 
     if (!article?.slug) {
       toast.error("Slug is required");
-      setLoading(false)
+      setLoading(false);
       return;
     }
 
@@ -92,14 +92,16 @@ const NewArticle = () => {
 
     setLoading(false);
 
+    const data = await res.json();
+
     if (res.status === 201) {
       toast.success("Article created successfully");
       setTimeout(() => {
         router.push("/admin");
       }, 400);
     } else {
-      console.log(res)
-      toast.error("Failed to create article");
+      console.log(data);
+      toast.error(data.error);
     }
   };
 
