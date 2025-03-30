@@ -17,12 +17,15 @@ import {
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
 import toast from "react-hot-toast";
+import { useSession } from "next-auth/react";
 
 export default function Articles() {
-  const [articles, setArticles] = useState<IArticles[]>([]);
+  const [articles, setArticles] = useState<IArticles[] | null>(null);
+  const { data: session } = useSession()
 
   // Delete Article
   const deleteArticle = async (id: string) => {
+    if (!articles) return;
     const promise = fetch("/api/article/delete", {
       method: "DELETE",
       body: JSON.stringify({ id }),
@@ -66,13 +69,18 @@ export default function Articles() {
   // Fetch articles
   useEffect(() => {
     const fetchArticles = async () => {
-      const res = await fetch("/api/article/all");
+      const res = await fetch("/api/article/all", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email: session?.user.email })
+      });
       const data = await res.json();
       setArticles(data);
     };
-
-    fetchArticles();
-  }, []);
+    if (session && !articles) {
+      fetchArticles();
+    }
+  }, [session, articles]);
 
   return (
     <div className="flex flex-col md:flex-row">
@@ -116,7 +124,7 @@ export default function Articles() {
               </tr>
             </thead>
             <tbody>
-              {articles.map((article, index) => (
+              {articles && articles?.map((article, index) => (
                 <tr
                   key={article.id}
                   className="bg-white border-b border-gray-200 hover:bg-gray-50"

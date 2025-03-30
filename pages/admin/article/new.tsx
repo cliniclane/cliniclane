@@ -14,6 +14,7 @@ const newArticle = {
   title: "",
   description: "",
   tags: [],
+  language: "",
   mdxString: `#Heading`,
   slug: "",
   headerImage: "",
@@ -124,13 +125,12 @@ const NewArticle = () => {
                     setActiveTab(tab.name);
                     router.push(`/admin/article/new?tab=${tab.name}`);
                   }}
-                  className={`inline-block capitalize p-4 border-b-2 rounded-t-lg ${
-                    tab.disabled
-                      ? "text-gray-400 cursor-not-allowed"
-                      : activeTab === tab.name
+                  className={`inline-block capitalize p-4 border-b-2 rounded-t-lg ${tab.disabled
+                    ? "text-gray-400 cursor-not-allowed"
+                    : activeTab === tab.name
                       ? "text-blue-600 border-blue-600"
                       : "border-transparent hover:text-gray-600 hover:border-gray-300"
-                  }`}
+                    }`}
                   disabled={tab.disabled}
                 >
                   {tab.name}

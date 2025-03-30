@@ -7,6 +7,17 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+model Users {
+  id            String   @id @map("_id")
+  email         String   @unique
+  password      String
+  role          String   @default("admin")
+  assignedBlogs String[] @default([])
+  status        String   @default("active")
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+}
+
 model Articles {
   id                   String   @id @map("_id")
   title                String
@@ -14,6 +25,7 @@ model Articles {
   tags                 String[]
   description          String
   author               String
+  language             String?
   headerImage          String
   publishDate          String
   mdxString            String
