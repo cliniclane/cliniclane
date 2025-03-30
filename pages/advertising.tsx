@@ -60,6 +60,6 @@ export const getStaticProps: GetStaticProps = async () => {
 
   return {
     props: { pageData: JSON.parse(JSON.stringify(pageData)) },
-    revalidate: 10000, // ISR: Revalidate every 10 seconds
+    revalidate: 15000, // ISR: Revalidate every 10 seconds
   };
 };
