@@ -51,10 +51,11 @@ const ReadAll = ({ articles }: { articles: Articles[] }) => {
 };
 
 export async function getStaticProps() {
+
   const res = await fetch(
     process.env.NEXT_PUBLIC_NEXTAUTH_URL + "/api/article/all",
     {
-      method: "GET",
+      method: "POST",
       headers: {
         "Content-Type": "application/json",
       },

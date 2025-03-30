@@ -22,7 +22,12 @@ const UsersPage = () => {
     // Fetch articles
     useEffect(() => {
         const fetchArticles = async () => {
-            const res = await fetch("/api/article/all");
+            const res = await fetch("/api/article/all", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+            });
             const data = await res.json();
             setArticles(data);
         };

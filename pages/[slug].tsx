@@ -178,11 +178,10 @@ const Article = ({ articleData }: ArticleProps) => {
         </button>
         {showAssessMent && (
           <iframe
-            src={`${
-              process.env.NEXT_PUBLIC_TEST_URL
-            }/nx/view/page/${encodeURIComponent(
-              `${process.env.NEXT_PUBLIC_NEXTAUTH_URL}/${articleData.slug}`
-            )}`}
+            src={`${process.env.NEXT_PUBLIC_TEST_URL
+              }/nx/view/page/${encodeURIComponent(
+                `${process.env.NEXT_PUBLIC_NEXTAUTH_URL}/${articleData.slug}`
+              )}`}
             width="100%"
             height="120vh"
             className="overflow-hidden h-screen"
@@ -200,7 +199,12 @@ const Article = ({ articleData }: ArticleProps) => {
 export const getStaticPaths: GetStaticPaths = async () => {
   const url = `${process.env.NEXT_PUBLIC_NEXTAUTH_URL}/api/article/all`; // Assuming an API that returns all slugs
 
-  const res = await fetch(url);
+  const res = await fetch(url, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+  });
   const articles: Articles[] = await res.json();
 
   const paths = articles.map((article) => ({
