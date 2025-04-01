@@ -27,7 +27,7 @@ export default function Articles() {
     if (status === "authenticated") {
       if (!session?.user.email || !session.user.role) signOut()
     }
-  }, [status]);
+  }, [status, session]);
 
   // Delete Article
   const deleteArticle = async (id: string) => {
