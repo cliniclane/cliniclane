@@ -17,11 +17,17 @@ import {
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
 import toast from "react-hot-toast";
-import { useSession } from "next-auth/react";
+import { signOut, useSession } from "next-auth/react";
 
 export default function Articles() {
   const [articles, setArticles] = useState<IArticles[] | null>(null);
-  const { data: session } = useSession()
+  const { data: session, status } = useSession()
+
+  useEffect(() => {
+    if (status === "authenticated") {
+      if (!session?.user.email || !session.user.role) signOut()
+    }
+  }, [status]);
 
   // Delete Article
   const deleteArticle = async (id: string) => {
