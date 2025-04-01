@@ -25,9 +25,9 @@ export default function Articles() {
 
   useEffect(() => {
     if (status === "authenticated") {
-      if (!session?.user.email || !session.user.role) signOut()
+      if (!session?.user.email || !session.user.role || !session.user.image) signOut()
     }
-  }, [status, session]);
+  }, [status, session, articles]);
 
   // Delete Article
   const deleteArticle = async (id: string) => {

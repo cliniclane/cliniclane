@@ -33,6 +33,7 @@ export const authOptions = {
               id: data.id,
               email: data.email,
               role: data.role,
+              image: data.status,
             };
           }
           // If the credentials are invalid, return null
