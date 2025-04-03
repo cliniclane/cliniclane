@@ -75,6 +75,14 @@ const Sidebar: FC<IProps> = ({ selected }) => {
               Users
             </li>
           </Link>}
+          {session?.user?.role === "super_admin" && <Link href="/admin/languages">
+            <li
+              className={`p-5 hover:bg-gray-500 ${selected === "languages" && "bg-gray-700"
+                }`}
+            >
+              Languages
+            </li>
+          </Link>}
           <button
             onClick={() => signOut()}
             className="absolute bottom-10 mx-auto w-full ml-5"

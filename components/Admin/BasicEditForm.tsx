@@ -1,7 +1,8 @@
 import React, { FC, useEffect, useState } from "react";
 import MdxEditor from "./MDXEditor";
-import { Articles } from "@prisma/client";
+import { Articles, Languages } from "@prisma/client";
 import { getCookie } from "cookies-next";
+import { useSession } from "next-auth/react";
 
 interface IProps {
   article: Articles;
@@ -23,11 +24,25 @@ const BasicEditForm: FC<IProps> = ({
   loading,
 }) => {
   const [theme, setTheme] = useState("github");
+  const [languages, setLanguages] = useState<Languages[] | null>(null);
+  const { data: session } = useSession()
 
   useEffect(() => {
     const c = getCookie("editor-theme");
     if (c) setTheme(c as string);
   }, []);
+
+  // Fetch users from API
+  const fetchLanguages = async () => {
+    const res = await fetch('/api/languages')
+    const data = await res.json()
+    setLanguages(data)
+  }
+  useEffect(() => {
+    if (!languages && session) {
+      fetchLanguages()
+    }
+  }, [languages, session]);
 
   return (
     <div className="w-full pt-10">
@@ -77,13 +92,18 @@ const BasicEditForm: FC<IProps> = ({
         <select
           name="language"
           id="language"
-          className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 "
-          value={article.language!} onChange={handleChange}>
-          <option value={"english"} selected>English</option>
-          <option value={"german"} >German</option>
-          <option value={"urdu"} >Urdu</option>
-
+          className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5"
+          value={article.language || ""} // Ensure default value is set
+          onChange={handleChange}
+        >
+          <option value="">Select a language</option>
+          {languages?.map((lang) => (
+            <option key={lang.code} value={lang.code}>
+              {lang.name}
+            </option>
+          ))}
         </select>
+
       </div>
 
       <div className="mb-6">
