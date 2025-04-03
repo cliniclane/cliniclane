@@ -141,7 +141,7 @@ export default function Articles() {
                   <td className="px-2 py-4">{index + 1}.</td>
                   <td className="px-4 py-4">{article.slug}</td>
                   <td className="px-4 py-4">{article.title}</td>
-                  <td className="px-4 py-4 capitalize">{article.language}</td>
+                  <td className="px-4 py-4 capitalize text-center">{article.language || "---"}</td>
                   <td className="px-4 py-4">
                     {new Date(article.publishDate).toDateString()}
                   </td>
