@@ -72,7 +72,7 @@ const BasicEditForm: FC<IProps> = ({
           htmlFor="language"
           className="block mb-2 text-lg font-semibold text-gray-900 "
         >
-          Langugae
+          Language
         </label>
         <select
           name="language"
