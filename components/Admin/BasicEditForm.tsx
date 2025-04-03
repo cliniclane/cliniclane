@@ -7,7 +7,7 @@ interface IProps {
   article: Articles;
   mdxString: string | undefined;
   handleChange: (
-    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>
   ) => void;
   setMdxString: React.Dispatch<React.SetStateAction<string | undefined>>;
   handleSave: () => void;
@@ -65,6 +65,27 @@ const BasicEditForm: FC<IProps> = ({
           onChange={handleChange}
         />
       </div>
+
+      {/* Languge */}
+      <div className="mb-6">
+        <label
+          htmlFor="language"
+          className="block mb-2 text-lg font-semibold text-gray-900 "
+        >
+          Langugae
+        </label>
+        <select
+          name="language"
+          id="language"
+          className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 "
+          value={article.language!} onChange={handleChange}>
+          <option value={"english"} selected>English</option>
+          <option value={"german"} >German</option>
+          <option value={"urdu"} >Urdu</option>
+
+        </select>
+      </div>
+
       <div className="mb-6">
         <label
           htmlFor="description"

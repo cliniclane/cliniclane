@@ -14,7 +14,7 @@ const newArticle = {
   title: "",
   description: "",
   tags: [],
-  language: "",
+  language: "english",
   mdxString: `#Heading`,
   slug: "",
   headerImage: "",
@@ -56,7 +56,7 @@ const NewArticle = () => {
   };
 
   const handleChange = (
-    e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+    e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>
   ) => {
     const { name, value } = e.target;
 
