@@ -6,6 +6,6 @@ export const config = {
     "/admin",
     "/admin/pages/:path*",
     "/admin/users",
-    "admin/languages",
+    "/admin/languages",
   ],
 };
