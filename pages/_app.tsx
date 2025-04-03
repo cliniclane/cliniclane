@@ -10,7 +10,6 @@ export default function App({
 }: AppProps) {
 
   return (
-
     <SessionProvider session={session}>
       <div className={`${atkinsonHyperlegible.className}`}>
         <Toaster position="top-center" reverseOrder={false} />
