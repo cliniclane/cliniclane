@@ -11,6 +11,11 @@ const nextConfig: NextConfig = {
       "media-hosting.imagekit.io",
     ],
   },
+  i18n: {
+    locales: ["en", "de", "fr"], // Add more languages as needed
+    defaultLocale: "en",
+    localeDetection: false, // Disable automatic detection
+  },
 };
 
 export default nextConfig;

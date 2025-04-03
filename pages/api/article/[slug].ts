@@ -8,15 +8,24 @@ export default async function handler(
   res: NextApiResponse
 ) {
   if (req.method === "GET") {
-    const { slug } = req.query;
+    const { slug, locale } = req.query;
+
     if (!slug) {
       return res.status(400).json({ error: "Missing required parameter" });
     }
 
     try {
-      const article = await prisma.articles.findUnique({
-        where: { slug: slug as string },
-      });
+      let article;
+
+      if (locale) {
+        article = await prisma.articles.findUnique({
+          where: { slug: slug as string, language: locale as string },
+        });
+      } else {
+        article = await prisma.articles.findUnique({
+          where: { slug: slug as string },
+        });
+      }
 
       res.status(200).json(article);
     } catch (error: unknown) {

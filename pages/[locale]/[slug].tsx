@@ -5,20 +5,22 @@ import { BsArrowRight } from "react-icons/bs";
 import { IoCopyOutline } from "react-icons/io5";
 import { useEffect, useState } from "react";
 import { serialize } from "next-mdx-remote/serialize";
-import MDXRenderer from "../components/MDXRenderer";
-import { extractHeadings } from "../lib/extractHeadings";
+import MDXRenderer from "../../components/MDXRenderer";
+import { extractHeadings } from "../../lib/extractHeadings";
 import { MDXRemoteSerializeResult } from "next-mdx-remote";
 import Link from "next/link";
 import ResumeForm from "@/components/ResumeForm";
 import { NextSeo } from "next-seo";
 import { Articles } from "@prisma/client";
 import { GetStaticProps, GetStaticPaths } from "next";
+import { setCookie } from "cookies-next";
 
 interface ArticleProps {
     articleData: Articles;
+    locale: string;
 }
 
-const Article = ({ articleData }: ArticleProps) => {
+const Article = ({ articleData, locale }: ArticleProps) => {
     const [mdxContent, setMdxContent] = useState<MDXRemoteSerializeResult<
         Record<string, unknown>,
         Record<string, unknown>
@@ -39,6 +41,11 @@ const Article = ({ articleData }: ArticleProps) => {
         }
         loadMDX();
     }, []);
+
+    useEffect(() => {
+        setCookie('preferredLanguage', locale)
+    }, [locale])
+
     return (
         <div className="w-full">
             {/*
@@ -196,6 +203,7 @@ const Article = ({ articleData }: ArticleProps) => {
     );
 };
 
+
 export const getStaticPaths: GetStaticPaths = async () => {
     const url = `${process.env.NEXT_PUBLIC_NEXTAUTH_URL}/api/article/all`; // Assuming an API that returns all slugs
 
@@ -206,10 +214,11 @@ export const getStaticPaths: GetStaticPaths = async () => {
         },
     });
     const articles: Articles[] = await res.json();
-
-    const paths = articles.map((article) => ({
-        params: { slug: article.slug },
-    }));
+    const paths = articles
+        .filter(blog => blog.slug)
+        .map(blog => ({
+            params: { locale: String(blog.language) || "english", slug: String(blog.slug) },
+        }));
 
     return {
         paths,
@@ -217,25 +226,28 @@ export const getStaticPaths: GetStaticPaths = async () => {
     };
 };
 
-export const getStaticProps: GetStaticProps<ArticleProps> = async ({
-    params,
-}) => {
-    const slug = params?.slug as string;
+export const getStaticProps: GetStaticProps<ArticleProps> = async ({ params }) => {
+    if (!params?.slug || !params?.locale) {
+        return { notFound: true };
+    }
 
-    const url = `${process.env.NEXT_PUBLIC_NEXTAUTH_URL}/api/article/${slug}`;
+    const locale = params?.locale
+    const slug = params?.slug
 
-    const res = await fetch(url);
-    const data: Articles = await res.json();
+    const url = `${process.env.NEXT_PUBLIC_NEXTAUTH_URL}/api/article/${slug}?locale=${locale}`;
+    const res = await fetch(url)
+    const blog = await res.json();
 
-    if (!data) {
-        return {
-            notFound: true,
-        };
+    if (!blog) {
+        return { notFound: true };
     }
 
     return {
-        props: { articleData: data },
-        revalidate: 1800, // Regenerate the page every 60 seconds
+        props: {
+            articleData: blog,
+            locale: locale as string,
+        },
+        revalidate: 60, // ISR: Regenerate page every 60 seconds
     };
 };
 
