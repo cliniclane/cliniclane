@@ -3,11 +3,12 @@ import "@/styles/globals.css"; // Your global styles
 import { SessionProvider } from "next-auth/react";
 import type { AppProps } from "next/app";
 import { Toaster } from "react-hot-toast";
+import { appWithTranslation } from 'next-i18next';
 
-export default function App({
+const App = ({
   Component,
   pageProps: { session, ...pageProps },
-}: AppProps) {
+}: AppProps) => {
 
   return (
     <SessionProvider session={session}>
@@ -16,6 +17,7 @@ export default function App({
         <Component {...pageProps} />
       </div>
     </SessionProvider>
-
   );
 }
+
+export default appWithTranslation(App);

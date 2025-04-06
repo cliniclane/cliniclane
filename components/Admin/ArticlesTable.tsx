@@ -82,7 +82,7 @@ const createColumns = ({
             accessorKey: "slug",
             header: "Slug",
             cell: ({ row }) => (
-                <div className="capitalize">{row.getValue("slug")}</div>
+                <div className="">{row.getValue("slug")}</div>
             ),
         },
         {
@@ -132,7 +132,7 @@ const createColumns = ({
                             <DropdownMenuItem
                                 asChild >
                                 <Link
-                                    href={`/admin/article/edit/${row.getValue("id")}?tab=basic`}
+                                    href={`/admin/article/edit/${row.original.id}?tab=basic`}
                                 >
 
                                     Edit

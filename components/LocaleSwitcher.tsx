@@ -1,33 +1,39 @@
-import { usePathname, useRouter } from "next/navigation";
+"use client";
+
+import { useRouter } from "next/router";
+import {
+    DropdownMenu,
+    DropdownMenuContent,
+    DropdownMenuItem,
+    DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import { Button } from "@/components/ui/button";
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
+import { Globe } from "lucide-react";
 
-const locales = [
-    { code: "en", name: "English" },
-    { code: "du", name: "German" },
-    { code: "er", name: "Urdu" }
-];
-
-export default function LocaleSwitcher({ currentLocale }: { currentLocale: string }) {
+export default function LocaleSwitcher() {
     const router = useRouter();
-    const pathname = usePathname();
+    const { locale, locales, asPath } = router;
 
-    const changeLocale = (locale: string) => {
-        const newPath = `/${locale}${pathname.replace(/^\/[a-z]{2}/, "")}`;
-        router.push(newPath);
+    const handleChange = (newLocale: string) => {
+        router.push(asPath, asPath, { locale: newLocale });
     };
 
     return (
         <DropdownMenu>
             <DropdownMenuTrigger asChild>
-                <Button variant="outline">
-                    {locales.find(l => l.code === (currentLocale || "en"))?.name || "English"}
+                <Button variant="outline" className="flex items-center space-x-2">
+                    <Globe className="w-4 h-4 mr-2" />
+                    <span className="capitalize">{locale}</span>
                 </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end">
-                {locales.map(({ code, name }) => (
-                    <DropdownMenuItem key={code} onClick={() => changeLocale(code)}>
-                        {name}
+                {locales?.map((loc) => (
+                    <DropdownMenuItem
+                        key={loc}
+                        onClick={() => handleChange(loc)}
+                        className="capitalize"
+                    >
+                        {loc}
                     </DropdownMenuItem>
                 ))}
             </DropdownMenuContent>

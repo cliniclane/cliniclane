@@ -5,6 +5,7 @@ import Newsletter from "@/components/Newsletter";
 import { Articles, PrismaClient } from "@prisma/client";
 import Image from "next/image";
 import Link from "next/link";
+import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 
 export default function Home({ articles }: { articles: Articles[] }) {
   return (
@@ -24,7 +25,7 @@ export default function Home({ articles }: { articles: Articles[] }) {
           <div className="flex flex-col space-y-3 justify-between">
             {/* Smaller Cards */}
             <Link
-              href={`/${articles[2].language || "english"}/${articles[2].slug}`}
+              href={articles[2].slug}
               className="relative hover:opacity-90 cursor-pointer rounded-xl overflow-hidden"
             >
               <Image
@@ -45,7 +46,7 @@ export default function Home({ articles }: { articles: Articles[] }) {
             </Link>
             {/* Smaller Cards */}
             <Link
-              href={`/${articles[1].language || "english"}/${articles[1].slug}`}
+              href={articles[1].slug}
               className="relative hover:opacity-90 cursor-pointer rounded-xl overflow-hidden"
             >
               <Image
@@ -67,7 +68,7 @@ export default function Home({ articles }: { articles: Articles[] }) {
           </div>
           {/* Large Main Card */}
           <Link
-            href={`/${articles[0].language || "english"}/${articles[0].slug}`}
+            href={articles[0].slug}
             className="md:col-span-2 hover:opacity-90 cursor-pointer relative rounded-xl overflow-hidden"
           >
             <Image
@@ -105,16 +106,17 @@ export default function Home({ articles }: { articles: Articles[] }) {
         <div className="p-5">
           <Newsletter />
         </div>
-      </main>
+      </main >
       {/*
        * Footer
        */}
-      <Footer />
-    </div>
+      < Footer />
+    </div >
   );
 }
 
-export async function getStaticProps() {
+export const getStaticProps = async ({ locale }: { locale: string }) => {
+
   const prisma = new PrismaClient();
 
   const articles = await prisma.articles.findMany({
@@ -128,6 +130,7 @@ export async function getStaticProps() {
   return {
     props: {
       articles,
+      ...(await serverSideTranslations(locale, ["common"])),
     },
     revalidate: 1800,
   };
