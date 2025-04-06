@@ -5,9 +5,10 @@ import TurndownService from 'turndown';
 import toast from "react-hot-toast";
 import { signOut, useSession } from "next-auth/react";
 import ArticleTable from "@/components/Admin/ArticlesTable";
+import { useArticlesStore } from "@/lib/store/articles.store";
 
 export default function Articles() {
-  const [articles, setArticles] = useState<IArticles[] | null>(null);
+  const { articles, setArticles } = useArticlesStore()
   const { data: session, status } = useSession()
   const [extractedData, setExtractedData] = useState<IArticles[] | null>(null);
 

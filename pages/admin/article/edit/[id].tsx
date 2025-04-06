@@ -1,6 +1,7 @@
 import BasicEditForm from "@/components/Admin/BasicEditForm";
 import SEOEditForm from "@/components/Admin/SEOEditForm";
 import Sidebar from "@/components/Admin/Sidebar";
+import { useArticlesStore } from "@/lib/store/articles.store";
 import { Articles } from "@prisma/client";
 import { useRouter } from "next/router";
 import React, { ChangeEvent, useEffect, useState } from "react";
@@ -19,6 +20,7 @@ const EditArticle = () => {
   ];
 
   const [article, setArticle] = useState<Articles | null>(null);
+  const { setArticles } = useArticlesStore()
   const [mdxString, setMdxString] = useState<string | undefined>(undefined);
   const [tags, setTags] = useState<string[]>([]);
   const [inputValue, setInputValue] = useState("");
@@ -69,6 +71,17 @@ const EditArticle = () => {
 
     if (res.status === 201) {
       toast.success("Article updated successfully");
+      // Update the articles state in the store
+      setArticles((prev) => {
+        if (!prev) return prev; // Ensure the previous state exists
+        return prev.map((article: Articles) => {
+          if (article.id === data.id) {
+            return { ...article, ...data };
+          }
+          return article;
+        });
+      });
+      // Redirect to the admin page after a short delay
       setTimeout(() => {
         router.push("/admin");
       }, 400);
@@ -110,10 +123,10 @@ const EditArticle = () => {
                     router.push(`/admin/article/edit/${id}?tab=${tab.name}`);
                   }}
                   className={`inline-block capitalize p-4 border-b-2 rounded-t-lg ${tab.disabled
-                      ? "text-gray-400 cursor-not-allowed"
-                      : activeTab === tab.name
-                        ? "text-blue-600 border-blue-600"
-                        : "border-transparent hover:text-gray-600 hover:border-gray-300"
+                    ? "text-gray-400 cursor-not-allowed"
+                    : activeTab === tab.name
+                      ? "text-blue-600 border-blue-600"
+                      : "border-transparent hover:text-gray-600 hover:border-gray-300"
                     }`}
                   disabled={tab.disabled}
                 >

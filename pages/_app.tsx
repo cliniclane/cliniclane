@@ -4,6 +4,7 @@ import { SessionProvider } from "next-auth/react";
 import type { AppProps } from "next/app";
 import { Toaster } from "react-hot-toast";
 import { appWithTranslation } from 'next-i18next';
+import { StoreProvider as ArticlesStoreProvider } from "@/lib/store/articles.store";
 
 const App = ({
   Component,
@@ -12,10 +13,12 @@ const App = ({
 
   return (
     <SessionProvider session={session}>
-      <div className={`${atkinsonHyperlegible.className}`}>
-        <Toaster position="top-center" reverseOrder={false} />
-        <Component {...pageProps} />
-      </div>
+      <ArticlesStoreProvider>
+        <div className={`${atkinsonHyperlegible.className}`}>
+          <Toaster position="top-center" reverseOrder={false} />
+          <Component {...pageProps} />
+        </div>
+      </ArticlesStoreProvider>
     </SessionProvider>
   );
 }

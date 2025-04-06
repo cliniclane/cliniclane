@@ -173,7 +173,7 @@ export default function ArticleTable({
     data: Articles[]
     extractedData: Articles[] | null
     setExtractedData: React.Dispatch<React.SetStateAction<Articles[] | null>>
-    setData: React.Dispatch<React.SetStateAction<Articles[] | null>>
+    setData: React.Dispatch<React.SetStateAction<Articles[] | null | undefined>>
     handleOnFileChange: (e: React.ChangeEvent<HTMLInputElement>) => void
 }) {
     const [sorting, setSorting] = React.useState<SortingState>([])
