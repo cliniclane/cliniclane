@@ -396,10 +396,10 @@ export default function ArticleTable({
                     </AlertDialogContent>
                 </AlertDialog>
                 <Input
-                    placeholder="Filter title..."
-                    value={(table.getColumn("title")?.getFilterValue() as string) ?? ""}
+                    placeholder="Filter Slug..."
+                    value={(table.getColumn("slug")?.getFilterValue() as string) ?? ""}
                     onChange={(event) =>
-                        table.getColumn("title")?.setFilterValue(event.target.value)
+                        table.getColumn("slug")?.setFilterValue(event.target.value)
                     }
                     className="lg:max-w-sm col-span-2"
                 />

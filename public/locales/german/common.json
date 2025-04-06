@@ -40,5 +40,18 @@
         "privacyLink": "Datenschutz",
         "copyright": "© 2025 Cliniclane Media LLC. Alle Rechte vorbehalten.",
         "disclaimer": "Unsere Website-Dienste, Inhalte und Produkte dienen nur zu Informationszwecken. Cliniclane Media bietet keine medizinische Beratung, Diagnose oder Behandlung an."
+    },
+    "mentalHealth": "Psychische Gesundheit",
+    "creators": "Ersteller",
+    "health": "Gesundheit",
+    "readArticle": "Artikel lesen →",
+    "mostPopularTitle": "Unsere beliebtesten Artikel",
+    "mostPopularDesc": "Die neuesten Nachrichten, Tipps und Ratschläge, um Ihr Geschäft reibungslos zu führen",
+    "readAllArticles": "Alle Artikel lesen",
+    "emailPlaceholder": "E-Mail-Adresse*",
+    "newsletterTitle": {
+        "part1": "Nehmen Sie an unserem",
+        "highlight": "30-Tage",
+        "part2": "Entgiftungsprogramm teil"
     }
 }

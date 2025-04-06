@@ -12,6 +12,8 @@ const nextConfig: NextConfig = {
       "plus.unsplash.com",
       "media-hosting.imagekit.io",
       "encrypted-tbn0.gstatic.com",
+      "www.google.com",
+      "img.express.pk",
     ],
   },
   i18n,

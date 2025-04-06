@@ -6,21 +6,19 @@ import { Articles, PrismaClient } from "@prisma/client";
 import Image from "next/image";
 import Link from "next/link";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
+import { useTranslation } from "next-i18next";
 
 export default function Home({ articles }: { articles: Articles[] }) {
+  const { t } = useTranslation("common");
+
   return (
     <div className="w-full">
-      {/*
-       * Navbar
-       */}
+      {/* Navbar */}
       <Navbar />
-      {/*
-       * Content
-       */}
+
+      {/* Content */}
       <main className="flex flex-col md:px-6 xl:px-14">
-        {/*
-         * Hero
-         */}
+        {/* Hero */}
         <div className="grid md:grid-cols-3 gap-4 p-5">
           <div className="flex flex-col space-y-3 justify-between">
             {/* Smaller Cards */}
@@ -37,7 +35,7 @@ export default function Home({ articles }: { articles: Articles[] }) {
               />
               <div className="absolute inset-0 bg-black bg-opacity-40 p-6 flex flex-col justify-end">
                 <span className="text-sm text-gray-300 uppercase">
-                  Mental Health
+                  {t("mentalHealth")}
                 </span>
                 <h3 className="text-white hover:text-blue-300 text-lg font-semibold leading-tight">
                   {articles[2].title}
@@ -58,7 +56,7 @@ export default function Home({ articles }: { articles: Articles[] }) {
               />
               <div className="absolute inset-0 bg-black bg-opacity-40 p-6 flex flex-col justify-end">
                 <span className="text-sm text-gray-300 uppercase">
-                  Creators
+                  {t("creators")}
                 </span>
                 <h3 className="text-white hover:text-blue-300 text-lg font-semibold leading-tight">
                   {articles[1].title}
@@ -66,6 +64,7 @@ export default function Home({ articles }: { articles: Articles[] }) {
               </div>
             </Link>
           </div>
+
           {/* Large Main Card */}
           <Link
             href={articles[0].slug}
@@ -79,44 +78,42 @@ export default function Home({ articles }: { articles: Articles[] }) {
               className="w-full h-full object-cover"
             />
             <div className="absolute inset-0 bg-black bg-opacity-40 p-6 flex flex-col justify-end">
-              <span className="text-sm text-gray-300 uppercase">Health</span>
+              <span className="text-sm text-gray-300 uppercase">
+                {t("health")}
+              </span>
               <h2 className="text-white hover:text-blue-300 text-2xl font-bold leading-tight">
                 {articles[0].title}
               </h2>
               <div className="mt-4 flex items-center space-x-4">
                 <button className="bg-white hover:bg-blue-300 text-black px-4 py-2 rounded-full text-sm">
-                  Read Article →
+                  {t("readArticle")}
                 </button>
                 <span className="text-white text-sm">
-                  by {articles[0].author || "Sid"}
+                  {t("by")} {articles[0].author || "Sid"}
                 </span>
               </div>
             </div>
           </Link>
         </div>
-        {/*
-         * Most Popular Articles
-         */}
+
+        {/* Most Popular Articles */}
         <div className="p-5">
           <MostPopular articles={articles.slice(-3)} />
         </div>
-        {/*
-         * Newsletter
-         */}
+
+        {/* Newsletter */}
         <div className="p-5">
           <Newsletter />
         </div>
-      </main >
-      {/*
-       * Footer
-       */}
-      < Footer />
-    </div >
+      </main>
+
+      {/* Footer */}
+      <Footer />
+    </div>
   );
 }
 
 export const getStaticProps = async ({ locale }: { locale: string }) => {
-
   const prisma = new PrismaClient();
 
   const articles = await prisma.articles.findMany({
@@ -124,7 +121,7 @@ export const getStaticProps = async ({ locale }: { locale: string }) => {
   });
 
   if (!articles) {
-    return { notFound: true }; // Return 404 if page not found
+    return { notFound: true };
   }
 
   return {
@@ -134,4 +131,4 @@ export const getStaticProps = async ({ locale }: { locale: string }) => {
     },
     revalidate: 1800,
   };
-}
+};

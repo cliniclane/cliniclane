@@ -1,11 +1,12 @@
 import Footer from "@/components/Footer";
 import Navbar from "@/components/Navbar";
 import { PagesContent, PrismaClient } from "@prisma/client";
-import { GetStaticProps } from "next";
 import { MDXRemoteSerializeResult } from "next-mdx-remote";
 import { useEffect, useState } from "react";
 import { serialize } from "next-mdx-remote/serialize";
 import MDXRenderer from "@/components/MDXRenderer";
+import { serverSideTranslations } from "next-i18next/serverSideTranslations";
+
 
 const About = ({ pageData }: { pageData: PagesContent }) => {
   const [mdxContent, setMdxContent] = useState<MDXRemoteSerializeResult<
@@ -47,7 +48,7 @@ const About = ({ pageData }: { pageData: PagesContent }) => {
 
 export default About;
 
-export const getStaticProps: GetStaticProps = async () => {
+export const getStaticProps = async ({ locale }: { locale: string }) => {
   const prisma = new PrismaClient();
 
   const pageData = await prisma.pagesContent.findUnique({
@@ -59,7 +60,10 @@ export const getStaticProps: GetStaticProps = async () => {
   }
 
   return {
-    props: { pageData: JSON.parse(JSON.stringify(pageData)) },
+    props: {
+      pageData: JSON.parse(JSON.stringify(pageData))
+      , ...(await serverSideTranslations(locale, ["common"])),
+    },
     revalidate: 10000, // ISR: Revalidate every 10 seconds
   };
 };

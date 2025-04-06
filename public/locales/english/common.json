@@ -40,5 +40,18 @@
         "privacyLink": "privacy",
         "copyright": "© 2025 Cliniclane Media LLC. All rights reserved.",
         "disclaimer": "Our website services, content, and products are for informational purposes only. Cliniclane Media does not provide medical advice, diagnosis, or treatment."
+    },
+    "mentalHealth": "Mental Health",
+    "creators": "Creators",
+    "health": "Health",
+    "readArticle": "Read Article →",
+    "mostPopularTitle": "Our most popular articles",
+    "mostPopularDesc": "The latest news, tips and advice to help you run your business with less fuss",
+    "readAllArticles": "Read All Articles",
+    "emailPlaceholder": "Email Address*",
+    "newsletterTitle": {
+        "part1": "Join our",
+        "highlight": "30 days",
+        "part2": "detox program"
     }
 }

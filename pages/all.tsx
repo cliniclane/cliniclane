@@ -4,6 +4,8 @@ import { Articles } from "@prisma/client";
 import Image from "next/image";
 import { useRouter } from "next/router";
 import React from "react";
+import { serverSideTranslations } from "next-i18next/serverSideTranslations";
+
 
 const ReadAll = ({ articles }: { articles: Articles[] }) => {
     const router = useRouter();
@@ -18,7 +20,7 @@ const ReadAll = ({ articles }: { articles: Articles[] }) => {
        */}
             <main className="flex flex-col md:px-6 xl:px-14">
                 <div className="grid grid-cols-1 my-6 gap-5 sm:grid-cols-1 md:grid-cols-2">
-                    {articles.map((article) => (
+                    {articles.slice(0, 40).map((article) => (
                         <div
                             onClick={() => router.push(`/[slug]`, `/${article.slug}`)}
                             key={article.id}
@@ -50,7 +52,7 @@ const ReadAll = ({ articles }: { articles: Articles[] }) => {
     );
 };
 
-export async function getStaticProps() {
+export const getStaticProps = async ({ locale }: { locale: string }) => {
 
     const res = await fetch(
         process.env.NEXT_PUBLIC_NEXTAUTH_URL + "/api/article/all",
@@ -66,6 +68,7 @@ export async function getStaticProps() {
     return {
         props: {
             articles,
+            ...(await serverSideTranslations(locale, ["common"])),
         },
     };
 }
