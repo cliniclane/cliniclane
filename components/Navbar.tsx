@@ -12,7 +12,7 @@ export default function Navbar() {
   };
 
   return (
-    <nav className="m-4 px-10 xl:px-[65px] py-4 flex items-center justify-between rounded-lg">
+    <nav className="m-4 px-1.5 md:px-10 xl:px-[65px] py-4 flex items-center justify-between rounded-lg">
       {/* Logo */}
       <Link
         href={"/"}
