@@ -1,27 +1,15 @@
 import Sidebar from "@/components/Admin/Sidebar";
 import { Articles as IArticles } from "@prisma/client";
-import Link from "next/link";
 import { useEffect, useState } from "react";
-// import toast from "react-hot-toast";
-import { FaEdit } from "react-icons/fa";
-import { MdDeleteForever } from "react-icons/md";
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-  AlertDialogTrigger,
-} from "@/components/ui/alert-dialog";
+import TurndownService from 'turndown';
 import toast from "react-hot-toast";
 import { signOut, useSession } from "next-auth/react";
+import ArticleTable from "@/components/Admin/ArticlesTable";
 
 export default function Articles() {
   const [articles, setArticles] = useState<IArticles[] | null>(null);
   const { data: session, status } = useSession()
+  const [extractedData, setExtractedData] = useState<IArticles[] | null>(null);
 
   useEffect(() => {
     if (status === "authenticated") {
@@ -29,47 +17,149 @@ export default function Articles() {
     }
   }, [status, session, articles]);
 
-  // Delete Article
-  const deleteArticle = async (id: string) => {
-    if (!articles) return;
-    const promise = fetch("/api/article/delete", {
-      method: "DELETE",
-      body: JSON.stringify({ id }),
-      headers: {
-        "Content-Type": "application/json",
-      },
-    });
-    toast.promise(promise, {
-      loading: "Deleting...",
-      success: () => {
-        const newArticles = articles.filter((article) => article.id !== id);
-        setArticles(newArticles);
-        return "Article deleted successfully";
-      },
-      error: (res) => {
-        console.log(res);
-        return "Failed to delete article";
-      },
+  const turndownService = new TurndownService();
+
+
+  const generateSlug = (title: string): string => {
+    return title
+      .toLowerCase()
+      .trim()
+      .replace(/[^\w\s-]/g, '')       // Remove special characters except space and hyphen
+      .replace(/\s+/g, '-')           // Replace spaces with hyphens
+      .replace(/-+/g, '-');           // Replace multiple hyphens with a single one
+  };
+
+  const formatSpecialContent = (md: string): string => {
+    // Step 0: Remove existing * list markers to avoid tree nesting
+    md = md.replace(/^\s*\*\s+/gm, '');
+
+    // Step 1: Replace array-like strings anywhere in content
+    md = md.replace(/\['([^']+?)'(?:,\s*'([^']+?)')+\]/g, (match) => {
+      try {
+        // Convert to real array format
+        const cleaned = match.replace(/'/g, '"');
+        const arr = JSON.parse(cleaned);
+        if (Array.isArray(arr)) {
+          return arr.map((item) => `- ${item}`).join('\n');
+        }
+      } catch {
+        return match;
+      }
+      return match;
     });
 
-    // const url = `${process.env.NEXT_PUBLIC_NEXTAUTH_URL}/api/article/delete`;
-    // const promise = fetch(url, {
-    //   method: "DELETE",
-    //   headers: { "Content-Type": "application/json" },
-    //   body: JSON.stringify({ id }),
-    // });
-    // toast.promise(promise, {
-    //   loading: "Deleting...",
-    //   success: () => {
-    //     const newArticles = articles.filter((article) => article.id !== id);
-    //     setArticles(newArticles);
-    //     return "Article deleted successfully";
-    //   },
-    //   error: (res) => {
-    //     console.log(res);
-    //     return "Failed to delete article";
-    //   },
-    // });
+    // Step 2: Convert stringified objects to list items
+    md = md.replace(/{[^{}]+}/g, (match) => {
+      try {
+        const normalized = match
+          .replace(/(['"])?([a-zA-Z0-9_ ]+)\1\s*:/g, '"$2":')
+          .replace(/'/g, '"');
+        const obj = JSON.parse(normalized);
+        if (typeof obj === 'object' && obj !== null) {
+          return Object.entries(obj)
+            .map(([key, value]) => `- **${key}**: ${value}`)
+            .join('\n');
+        }
+      } catch {
+        // Return the original match as a fallback
+        return match;
+      }
+      // Ensure a string is always returned
+      return match;
+    });
+
+    return md;
+  };
+
+  const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    const text = await file.text();
+    const rawData = JSON.parse(text);
+
+    type RawArticle = {
+      headline: string;
+      datePublished: string;
+      datePublishedRaw: string;
+      dateModified: string;
+      dateModifiedRaw: string;
+      authors: {
+        name: string;
+        nameRaw: string;
+      }[];
+      breadcrumbs: {
+        name: string;
+        url: string;
+      }[];
+      inLanguage: string;
+      description: string;
+      articleBody: string;
+      articleBodyHtml: string;
+      canonicalUrl: string;
+      url: string;
+      metadata: {
+        dateDownloaded: string;
+        probability: number;
+        _type: string;
+      };
+    }
+
+    const formatted: IArticles[] = rawData.map((item: RawArticle) => ({
+      id: Math.random().toString(36).substring(2, 15),
+      title: item.headline,
+      slug: generateSlug(item.headline),
+      tags: [],
+      description: item.description || "",
+      author: item.authors[0].name || "",
+      language: item.inLanguage || "english",
+      headerImage: "",
+      publishDate: new Date().toISOString(),
+      mdxString: formatSpecialContent(turndownService.turndown(item.articleBodyHtml)) || "",
+      canonical: item.canonicalUrl || "",
+      openGraphImage: "",
+      openGraphTitle: item.headline || "",
+      openGraphDescription: item.description || "",
+    }));
+
+    // Check for duplicates
+    const duplicateSlugs = formatted.map((item) => item.slug);
+
+    const uniqueSlugs = new Set(duplicateSlugs);
+    const hasDuplicates = duplicateSlugs.length !== uniqueSlugs.size;
+    if (hasDuplicates) {
+      toast.error("Duplicate slugs found in the imported articles.");
+      return;
+    }
+
+    // Check for empty titles
+    const emptyTitles = formatted.filter((item) => !item.title);
+    if (emptyTitles.length) {
+      toast.error("Found articles with empty titles. Please ensure all articles have a headline.");
+      return;
+    }
+
+    // Map through the languages and set the name value 
+    const languages = [
+      { code: "en", name: "english" },
+      { code: "es", name: "spanish" },
+      { code: "fr", name: "french" },
+      { code: "de", name: "german" },
+      { code: "it", name: "italian" },
+      { code: "pt", name: "portuguese" },
+    ];
+
+    formatted.forEach((item) => {
+      const lang = languages.find((lang) => lang.code === item.language);
+      if (lang) {
+        item.language = lang.name;
+      } else {
+        item.language = "english"; // Default to English if not found
+      }
+    });
+
+    setExtractedData(formatted);
+
   };
 
   // Fetch articles
@@ -94,96 +184,15 @@ export default function Articles() {
       <Sidebar selected="articles" />
 
       {/* Content */}
-      <div className="md:pl-48 py-10 px-4 sm:px-6 mt-10 md:mt-0 w-full">
+      <div className="md:pl-48 py-6 px-4 sm:px-6 mt-10 md:mt-0 w-full">
         <div className="flex w-full justify-between">
           <span className="text-2xl font-medium underline text-gray-500">
             All Articles
           </span>
-          <Link
-            href="/admin/article/new?tab=basic"
-            className="bg-blue-500 px-5 py-2 text-white rounded-md"
-          >
-            New Article
-          </Link>
         </div>
 
         {/* Responsive Table */}
-        <div className="overflow-x-auto mt-6">
-          <table className="w-full text-sm text-left text-gray-800">
-            <thead className="text-gray-800 uppercase bg-gray-200">
-              <tr>
-                <th scope="col" className="px-2 py-3">
-                  #
-                </th>
-                <th scope="col" className="px-4 py-3">
-                  Slug
-                </th>
-                <th scope="col" className="px-4 py-3">
-                  Title
-                </th>
-                <th scope="col" className="px-4 py-3">
-                  Language
-                </th>
-                <th scope="col" className="px-4 py-3">
-                  Publish Date
-                </th>
-                <th scope="col" className="px-4 py-3">
-                  Action
-                </th>
-              </tr>
-            </thead>
-            <tbody>
-              {articles && articles?.map((article, index) => (
-                <tr
-                  key={article.id}
-                  className="bg-white border-b border-gray-200 hover:bg-gray-50"
-                >
-                  <td className="px-2 py-4">{index + 1}.</td>
-                  <td className="px-4 py-4">{article.slug}</td>
-                  <td className="px-4 py-4">{article.title}</td>
-                  <td className="px-4 py-4 capitalize text-center">{article.language || "---"}</td>
-                  <td className="px-4 py-4">
-                    {new Date(article.publishDate).toDateString()}
-                  </td>
-                  <td className="px-4 py-4 flex gap-4">
-                    <Link
-                      href={`/admin/article/edit/${article.id}?tab=basic`}
-                      className="text-xl"
-                    >
-                      <FaEdit />
-                    </Link>
-
-                    <AlertDialog>
-                      <AlertDialogTrigger>
-                        <MdDeleteForever className="text-2xl text-red-600" />
-                      </AlertDialogTrigger>
-                      <AlertDialogContent>
-                        <AlertDialogHeader>
-                          <AlertDialogTitle>
-                            Do you want to delete this article
-                          </AlertDialogTitle>
-                          <AlertDialogDescription>
-                            This action cannot be undone. This will permanently
-                            delete your account and remove your data from our
-                            servers.
-                          </AlertDialogDescription>
-                        </AlertDialogHeader>
-                        <AlertDialogFooter>
-                          <AlertDialogCancel>Cancel</AlertDialogCancel>
-                          <AlertDialogAction
-                            onClick={() => deleteArticle(article.id)}
-                          >
-                            Continue
-                          </AlertDialogAction>
-                        </AlertDialogFooter>
-                      </AlertDialogContent>
-                    </AlertDialog>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
+        {articles && <ArticleTable setExtractedData={setExtractedData} extractedData={extractedData} handleOnFileChange={handleFileChange} data={articles} setData={setArticles} />}
       </div>
     </div>
   );

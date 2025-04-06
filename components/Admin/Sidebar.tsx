@@ -14,8 +14,6 @@ const Sidebar: FC<IProps> = ({ selected }) => {
   const [isMobile, setIsMobile] = useState(false);
   const { data: session } = useSession();
 
-  console.log(session);
-
   useEffect(() => {
     const handleResize = () => {
       setIsMobile(window.innerWidth < 768);
