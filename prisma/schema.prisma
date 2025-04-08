@@ -52,3 +52,10 @@ model PagesContent {
   createdAt  DateTime @default(now())
   updatedAt  DateTime @updatedAt
 }
+
+model Images {
+  id         String   @id @map("_id")
+  url        String
+  uploadedBy String
+  createdAt  DateTime @default(now())
+}

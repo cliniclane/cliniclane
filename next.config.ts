@@ -14,6 +14,8 @@ const nextConfig: NextConfig = {
       "encrypted-tbn0.gstatic.com",
       "www.google.com",
       "img.express.pk",
+      "res.cloudinary.com",
+      "ucarecdn.com",
     ],
   },
   i18n,

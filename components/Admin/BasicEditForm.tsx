@@ -1,8 +1,19 @@
 import React, { FC, useEffect, useState } from "react";
 import MdxEditor from "./MDXEditor";
-import { Articles, Languages } from "@prisma/client";
+import { Articles, Images, Languages } from "@prisma/client";
 import { getCookie } from "cookies-next";
 import { useSession } from "next-auth/react";
+import { FileUploaderRegular } from "@uploadcare/react-uploader";
+import "@uploadcare/react-uploader/core.css";
+import { EllipsisVertical } from "lucide-react";
+import { Button } from "../ui/button";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu"
+import toast from "react-hot-toast";
 
 interface IProps {
   article: Articles;
@@ -25,6 +36,7 @@ const BasicEditForm: FC<IProps> = ({
 }) => {
   const [theme, setTheme] = useState("github");
   const [languages, setLanguages] = useState<Languages[] | null>(null);
+  const [userImages, setUserImages] = useState<Images[] | null>(null);
   const { data: session } = useSession()
 
   useEffect(() => {
@@ -38,11 +50,27 @@ const BasicEditForm: FC<IProps> = ({
     const data = await res.json()
     setLanguages(data)
   }
+
+
+  // Fetch user images 
+  const fetchUserImages = async () => {
+    const res = await fetch(`/api/images?email=${session?.user.email}`)
+    const data = await res.json()
+    setUserImages(data)
+  }
+
+  useEffect(() => {
+    if (!userImages && session) {
+      fetchUserImages()
+    }
+  }, [userImages, session]);
+
   useEffect(() => {
     if (!languages && session) {
       fetchLanguages()
     }
   }, [languages, session]);
+
 
   return (
     <div className="w-full pt-10">
@@ -130,14 +158,80 @@ const BasicEditForm: FC<IProps> = ({
         >
           Image
         </label>
-        <textarea
-          cols={6}
-          id="headerImage"
-          name="headerImage"
-          onChange={handleChange}
-          value={article?.headerImage}
-          className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 :bg-gray-700"
-        />
+        <div className="grid grid-cols-3">
+          <div className="flex flex-col justify-center space-y-5">
+            <span className="text-gray-400">
+              Total {userImages?.length} images available
+            </span>
+            <FileUploaderRegular
+              accept="image/*"
+              onFileUploadSuccess={(fileInfo) => {
+                const payload = {
+                  fileURL: fileInfo.cdnUrl,
+                  userID: session?.user.email,
+                }
+                fetch("/api/images", {
+                  method: "POST",
+                  headers: {
+                    "Content-Type": "application/json",
+                  },
+                  body: JSON.stringify(payload),
+                })
+                  .then((res) => res.json())
+                  .then((data) => {
+                    const images = [...userImages!, data];
+                    setUserImages(images);
+                  })
+                  .catch((error) => {
+                    console.error("Error:", error);
+                  });
+              }}
+              pubkey={process.env.NEXT_PUBLIC_UPLOAD_CARE_PUBLIC_KEY!} />
+          </div>
+
+          <div className={`columns-1 col-span-2 border rounded-lg overflow-y-auto p-2.5 sm:columns-2 md:columns-3 gap-2.5 space-y-4 mt-5 ${userImages?.length === 0 && "hidden"}`}>
+            {userImages &&
+              userImages?.map((image => (
+                <div key={image.id} className="w-full relative break-inside-avoid rounded overflow-hidden">
+
+                  <DropdownMenu >
+                    <DropdownMenuTrigger className="absolute right-2 top-2" asChild>
+                      <Button size="icon" variant="outline" >
+                        <EllipsisVertical />
+                      </Button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent>
+                      <DropdownMenuItem
+                        onClick={() => {
+                          navigator.clipboard.writeText(image.url)
+                          toast.success("Link copied to clipboard")
+                        }}
+                      >Copy Link</DropdownMenuItem>
+                      <DropdownMenuItem
+                        onClick={() => {
+                          fetch("/api/images", {
+                            method: "DELETE",
+                            headers: {
+                              "Content-Type": "application/json",
+                            },
+                            body: JSON.stringify({
+                              imageID: image.id
+                            }),
+                          }).then(() => {
+                            setUserImages(userImages?.filter((img) => img.id !== image.id) || null);
+                          })
+                        }}
+                      >Delete</DropdownMenuItem>
+                    </DropdownMenuContent>
+                  </DropdownMenu>
+
+                  <img className="h-auto max-w-full border rounded-lg" src={image.url} alt="" />
+                </div>
+              )))
+            }
+          </div>
+        </div>
+
       </div>
       <div className="mb-6 mt-16 h-[110vh]">
         <label

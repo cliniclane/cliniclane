@@ -697,14 +697,13 @@ export default function UsersTable({
 
                 {/* Password Dialog */}
                 <Dialog open={isPasswordChangeModalOpen} onOpenChange={setIsPasswordChangeModalOpen}>
-                    <DialogTrigger asChild>
-                        <Button variant="outline">Edit Profile</Button>
-                    </DialogTrigger>
                     <DialogContent className="sm:max-w-[425px]">
                         <DialogHeader>
                             <DialogTitle>Change Password</DialogTitle>
                             <DialogDescription>
-                                Enter the new password for the user.
+                                Enter the new password for {
+                                    data.find((user) => user.id === selectedUserId)?.email
+                                }.
                             </DialogDescription>
                         </DialogHeader>
                         <div className="grid gap-4 py-4">
