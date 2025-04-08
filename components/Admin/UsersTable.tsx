@@ -60,9 +60,11 @@ import toast from "react-hot-toast"
 const createColumns = ({
     setSelectedUserId,
     setIsSheetOpen,
+    setIsPasswordChangeModalOpen
 }: {
     setSelectedUserId: React.Dispatch<React.SetStateAction<string | null>>
     setIsSheetOpen: React.Dispatch<React.SetStateAction<boolean>>
+    setIsPasswordChangeModalOpen: React.Dispatch<React.SetStateAction<boolean>>
 }): ColumnDef<Users>[] => [
         {
             id: "select",
@@ -192,6 +194,14 @@ const createColumns = ({
                                 }}
                             >
                                 Assign Blogs
+                            </DropdownMenuItem>
+                            <DropdownMenuItem
+                                onClick={() => {
+                                    setIsPasswordChangeModalOpen(true);
+                                    setSelectedUserId(user.id);
+                                }}
+                            >
+                                Change Password
                             </DropdownMenuItem>
                             <DropdownMenuSeparator />
                             <DropdownMenuItem>Delete</DropdownMenuItem>
@@ -364,15 +374,17 @@ export default function UsersTable({
     const [loading, setLoading] = React.useState(false)
     const [isCreateUserOpen, setIsCreateUserOpen] = React.useState(false);
     const [selectedBlogs, setSelectedBlogs] = React.useState<Set<string>>(new Set())
+    const [isPasswordChangeModalOpen, setIsPasswordChangeModalOpen] = React.useState(false)
 
     // ✅ State for Sheet
     const [selectedUserId, setSelectedUserId] = React.useState<string | null>(null)
     const [isSheetOpen, setIsSheetOpen] = React.useState(false)
+    const [newPassword, setNewPassword] = React.useState("")
 
     // ✅ Pass state setters to createColumns
     const columns = React.useMemo(
-        () => createColumns({ setSelectedUserId, setIsSheetOpen }),
-        [setSelectedUserId, setIsSheetOpen]
+        () => createColumns({ setSelectedUserId, setIsSheetOpen, setIsPasswordChangeModalOpen }),
+        [setSelectedUserId, setIsSheetOpen, setIsPasswordChangeModalOpen]
     )
 
     const table = useReactTable({
@@ -510,8 +522,48 @@ export default function UsersTable({
         return true;
     };
 
+    const handlePasswordChange = async () => {
+        if (newPassword.length < 5) {
+            toast.error("Password must be at least 5 characters long")
+            return
+        }
 
+        setLoading(true)
+        const updatedUser = {
+            id: selectedUserId,
+            password: newPassword,
+        }
+        const URL = "/api/users/password"
 
+        // Add new user to the database
+        try {
+            const res = await fetch(URL, {
+                method: "PUT",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify(updatedUser),
+            })
+
+            if (!res.ok) {
+                throw new Error("Failed to add new user")
+            }
+            toast.success("Password updated successfully")
+            setNewPassword("")
+            // update user password
+            setData(data.map((user) =>
+                user.id === selectedUserId ? { ...user, password: newPassword } : user
+            ))
+        }
+        catch (error) {
+            console.error(error)
+            toast.error("Failed to update password")
+        }
+        finally {
+            setLoading(false)
+            setIsPasswordChangeModalOpen(false)
+        }
+    }
 
     return (
         <div className="w-full">
@@ -642,6 +694,37 @@ export default function UsersTable({
                     </DialogContent>
                 </Dialog>
 
+
+                {/* Password Dialog */}
+                <Dialog open={isPasswordChangeModalOpen} onOpenChange={setIsPasswordChangeModalOpen}>
+                    <DialogTrigger asChild>
+                        <Button variant="outline">Edit Profile</Button>
+                    </DialogTrigger>
+                    <DialogContent className="sm:max-w-[425px]">
+                        <DialogHeader>
+                            <DialogTitle>Change Password</DialogTitle>
+                            <DialogDescription>
+                                Enter the new password for the user.
+                            </DialogDescription>
+                        </DialogHeader>
+                        <div className="grid gap-4 py-4">
+                            <div className="grid grid-cols-4 items-center gap-4">
+                                <Label htmlFor="password" className="text-right">
+                                    Password
+                                </Label>
+                                <Input id="password" value={newPassword} onChange={(e) => {
+                                    setNewPassword(e.target.value)
+                                }} className="col-span-3" />
+                            </div>
+                        </div>
+                        <DialogFooter>
+                            <Button type="submit"
+                                onClick={handlePasswordChange}
+                                disabled={loading}
+                            >Save changes</Button>
+                        </DialogFooter>
+                    </DialogContent>
+                </Dialog>
             </div>
             <div className="rounded-md border">
                 <Table>
