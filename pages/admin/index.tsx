@@ -31,13 +31,12 @@ export default function Articles() {
   };
 
   const formatSpecialContent = (md: string): string => {
-    // Step 0: Remove existing * list markers to avoid tree nesting
+    // Step 0: Remove existing * list markers to avoid nested trees
     md = md.replace(/^\s*\*\s+/gm, '');
 
-    // Step 1: Replace array-like strings anywhere in content
-    md = md.replace(/\['([^']+?)'(?:,\s*'([^']+?)')+\]/g, (match) => {
+    // Step 1: Replace array-like strings anywhere in content with markdown lists
+    md = md.replace(/\[\s*(?:'[^']*'\s*,\s*)*'[^']*'\s*\]/g, (match) => {
       try {
-        // Convert to real array format
         const cleaned = match.replace(/'/g, '"');
         const arr = JSON.parse(cleaned);
         if (Array.isArray(arr)) {
@@ -49,11 +48,11 @@ export default function Articles() {
       return match;
     });
 
-    // Step 2: Convert stringified objects to list items
+    // Step 2: Convert stringified object-like structures to markdown
     md = md.replace(/{[^{}]+}/g, (match) => {
       try {
         const normalized = match
-          .replace(/(['"])?([a-zA-Z0-9_ ]+)\1\s*:/g, '"$2":')
+          .replace(/(['"])?([a-zA-Z0-9_ ]+)\1?\s*:/g, '"$2":')
           .replace(/'/g, '"');
         const obj = JSON.parse(normalized);
         if (typeof obj === 'object' && obj !== null) {
@@ -62,15 +61,14 @@ export default function Articles() {
             .join('\n');
         }
       } catch {
-        // Return the original match as a fallback
         return match;
       }
-      // Ensure a string is always returned
       return match;
     });
 
     return md;
   };
+
 
   const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -84,6 +82,8 @@ export default function Articles() {
       datePublished: string;
       datePublishedRaw: string;
       dateModified: string;
+      isMdx?: boolean,
+      commonSideEffects: string[]
       dateModifiedRaw: string;
       authors: {
         name: string;
@@ -110,13 +110,13 @@ export default function Articles() {
       id: Math.random().toString(36).substring(2, 15),
       title: item.headline,
       slug: generateSlug(item.headline),
-      tags: [],
+      tags: item.commonSideEffects,
       description: item.description || "",
       author: item.authors[0].name || "",
       language: item.inLanguage || "english",
       headerImage: "",
       publishDate: new Date().toISOString(),
-      mdxString: formatSpecialContent(turndownService.turndown(item.articleBodyHtml)) || "",
+      mdxString: item.isMdx ? item.articleBodyHtml : formatSpecialContent(turndownService.turndown(item.articleBodyHtml)) || "",
       canonical: item.canonicalUrl || "",
       openGraphImage: "",
       openGraphTitle: item.headline || "",

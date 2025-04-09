@@ -47,6 +47,34 @@ import {
 import { Articles } from "@prisma/client"
 import toast from "react-hot-toast"
 import Link from "next/link"
+type RawArticle = {
+    headline: string;
+    datePublished: string;
+    datePublishedRaw: string;
+    dateModified: string;
+    commonSideEffects: string[]
+    dateModifiedRaw: string;
+    isMdx: boolean,
+    authors: {
+        name: string;
+        nameRaw: string;
+    }[];
+    breadcrumbs: {
+        name: string;
+        url: string;
+    }[];
+    inLanguage: string;
+    description: string;
+    articleBody: string;
+    articleBodyHtml: string;
+    canonicalUrl: string;
+    url: string;
+    metadata: {
+        dateDownloaded: string;
+        probability: number;
+        _type: string;
+    };
+}
 
 
 const createColumns = ({
@@ -225,6 +253,64 @@ export default function ArticleTable({
             setIsImportModalOpen(false);
         }
     }
+
+    const stripMarkdown = (md: string) => {
+        return md
+            .replace(/[*_~`>#-]+/g, '')      // remove markdown syntax
+            .replace(/\\\[/g, '[')           // unescape \[
+            .replace(/\\\]/g, ']')           // unescape \]
+            .replace(/\n{2,}/g, '\n');       // normalize new lines
+    };
+
+    // Export Article in json file
+    const handleExport = () => {
+        if (!data) return;
+
+        const selectedArticles = table.getFilteredSelectedRowModel().rows.map((row) => {
+            const article = row.original;
+
+            const rawArticle: RawArticle = {
+                headline: article.title || "",
+                datePublished: article.publishDate || "",
+                datePublishedRaw: article.publishDate || "",
+                dateModified: article.publishDate || "", // assuming no separate dateModified field
+                dateModifiedRaw: article.publishDate || "",
+                commonSideEffects: article.tags,
+                authors: [
+                    {
+                        name: article.author || "",
+                        nameRaw: article.author || "",
+                    },
+                ],
+                breadcrumbs: [], // Add breadcrumbs if available in original article
+                inLanguage: article.language || "english",
+                description: article.description || "",
+                articleBody: stripMarkdown(article.mdxString),
+                isMdx: true,
+                articleBodyHtml: article.mdxString,
+                canonicalUrl: article.canonical || "",
+                url: article.canonical || "",
+                metadata: {
+                    dateDownloaded: new Date().toISOString(),
+                    probability: 1,
+                    _type: "drug-article",
+                },
+            };
+
+            return rawArticle;
+        });
+
+        const jsonContent = JSON.stringify(selectedArticles, null, 2);
+        const blob = new Blob([jsonContent], { type: "application/json" });
+        const url = URL.createObjectURL(blob);
+
+        const a = document.createElement("a");
+        a.href = url;
+        a.download = `${new Date().toISOString()}_articles.json`;
+        a.click();
+        URL.revokeObjectURL(url);
+    };
+
 
     // Delete Article
     const deleteArticle = async (id: string) => {
@@ -412,11 +498,19 @@ export default function ArticleTable({
                     </Button> : <div></div>
                 }
 
-                <Button variant="outline" className="py-2"
-                    onClick={() => setIsImportModalOpen(true)}>
-                    <Import />
-                    Import
-                </Button>
+                {
+                    table.getFilteredSelectedRowModel().rows.length === 0 ?
+                        <Button variant="outline" className="py-2"
+                            onClick={() => setIsImportModalOpen(true)}>
+                            <Import />
+                            Import
+                        </Button>
+                        : <Button variant="outline" className="py-2 bg-green-600 text-white"
+                            onClick={handleExport}>
+                            <Import className="rotate-90" />
+                            Export
+                        </Button>
+                }
 
                 <DropdownMenu>
                     <DropdownMenuTrigger asChild>
