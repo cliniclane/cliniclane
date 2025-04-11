@@ -16,6 +16,7 @@ const nextConfig: NextConfig = {
       "img.express.pk",
       "res.cloudinary.com",
       "ucarecdn.com",
+      "onemg.gumlet.io",
     ],
   },
   i18n,

@@ -1,11 +1,61 @@
 import Sidebar from "@/components/Admin/Sidebar";
 import { Articles as IArticles } from "@prisma/client";
 import { useEffect, useState } from "react";
-import TurndownService from 'turndown';
 import toast from "react-hot-toast";
 import { signOut, useSession } from "next-auth/react";
 import ArticleTable from "@/components/Admin/ArticlesTable";
 import { useArticlesStore } from "@/lib/store/articles.store";
+
+type RawArticle = {
+  headline: string;
+  datePublished: string;
+  datePublishedRaw: string;
+  dateModified: string;
+  dateModifiedRaw: string;
+  authors: {
+    name: string;
+    nameRaw: string;
+  }[];
+  breadcrumbs: {
+    name: string;
+    url: string;
+  }[];
+  inLanguage: string;
+  description: string;
+  articleBody: string;
+  articleBodyHtml: string;
+  canonicalUrl: string;
+  url: string;
+  productDetails: {
+    productUrl: string;
+    productName: string;
+    price: string;
+    imageUrls: string[];
+    saltComposition: string;
+    storage: string;
+    productIntroduction: string;
+    howToUse: string;
+    howItWorks: string;
+    sideEffects: string;
+    commonSideEffects: string[];
+    safetyAdvice: string; // Can be parsed into a nested object
+    missedDosage: string;
+    quickTips: string[];
+    factBox: string;
+    userFeedback: string;
+    faqs: string;
+    substitutes: string; // Can be parsed into object[]
+    prescriptionRequired: string;
+    uses: string[]; // stringified arrays
+    benefits: string; // stringified object
+  };
+  metadata: {
+    dateDownloaded: string;
+    probability: number;
+    _type: string;
+  };
+  isMdx: boolean;
+}
 
 export default function Articles() {
   const { articles, setArticles } = useArticlesStore()
@@ -18,8 +68,6 @@ export default function Articles() {
     }
   }, [status, session, articles]);
 
-  const turndownService = new TurndownService();
-
 
   const generateSlug = (title: string): string => {
     return title
@@ -30,45 +78,79 @@ export default function Articles() {
       .replace(/-+/g, '-');           // Replace multiple hyphens with a single one
   };
 
-  const formatSpecialContent = (md: string): string => {
-    // Step 0: Remove existing * list markers to avoid nested trees
-    md = md.replace(/^\s*\*\s+/gm, '');
+  function generateMarkdown(article: RawArticle): string {
+    const { description, productDetails } = article;
+    const pd = productDetails;
 
-    // Step 1: Replace array-like strings anywhere in content with markdown lists
-    md = md.replace(/\[\s*(?:'[^']*'\s*,\s*)*'[^']*'\s*\]/g, (match) => {
+    const parseStringArray = (input: string): string[] => {
       try {
-        const cleaned = match.replace(/'/g, '"');
-        const arr = JSON.parse(cleaned);
-        if (Array.isArray(arr)) {
-          return arr.map((item) => `- ${item}`).join('\n');
-        }
+        const fixed = input.replace(/'/g, '"');
+        const parsed = JSON.parse(fixed);
+        return Array.isArray(parsed) ? parsed : [];
       } catch {
-        return match;
+        return [];
       }
-      return match;
-    });
+    };
 
-    // Step 2: Convert stringified object-like structures to markdown
-    md = md.replace(/{[^{}]+}/g, (match) => {
+    const parseObject = (input: string): Record<string, { Status: string; Details: string }> => {
       try {
-        const normalized = match
-          .replace(/(['"])?([a-zA-Z0-9_ ]+)\1?\s*:/g, '"$2":')
-          .replace(/'/g, '"');
-        const obj = JSON.parse(normalized);
-        if (typeof obj === 'object' && obj !== null) {
-          return Object.entries(obj)
-            .map(([key, value]) => `- **${key}**: ${value}`)
-            .join('\n');
-        }
+        return JSON.parse(input.replace(/'/g, '"'));
       } catch {
-        return match;
+        return {};
       }
-      return match;
-    });
+    };
 
-    return md;
-  };
+    const safetyAdviceObj = parseObject(pd.safetyAdvice);
+    const benefits = parseObject(pd.benefits);
+    const uses = parseStringArray(pd.uses[0] || "[]");
 
+    const markdown = `
+  ## 💊 Product Details
+  - **💰 Price:** ${pd.price}
+  - **🧪 Salt Composition:** ${pd.saltComposition}
+  - **📦 Storage:** ${pd.storage}
+  - **📋 Prescription Required:** Yes
+  
+  ---
+  
+  ## 📝 Description
+  ${description}
+  
+  ## ⚙️ How It Works
+  ${pd.howItWorks}
+  
+  ## 🎯 Uses
+  ${uses.map((item, i) => `${i + 1}. ${item}`).join('\n')}
+  
+  ## 📥 How to Use
+  ${pd.howToUse}
+  
+  ## ⚠️ Common Side Effects
+  ${pd.commonSideEffects.filter(Boolean).map(effect => `- ${effect}`).join('\n')}
+  
+  ## 🛡️ Safety Advice
+  ${Object.entries(safetyAdviceObj)
+        .map(([key, val]) => `### 🧷 ${key}\n- **Status:** ${val.Status}\n- **Details:** ${val.Details}`)
+        .join('\n\n')}
+  
+  ## ⏱️ Missed Dosage
+  ${pd.missedDosage}
+  
+  ## 💡 Quick Tips
+  ${pd.quickTips.filter(Boolean).map(tip => `- ${tip}`).join('\n')}
+  
+  ## 🌟 Benefits
+  ${Object.entries(benefits)
+        .map(([key, val]) => `### ✅ ${key}\n${val}`)
+        .join('\n\n')}
+  
+  ## ❓ FAQs
+  ${pd.faqs}
+  
+   `.trim();
+
+    return markdown;
+  }
 
   const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -77,48 +159,19 @@ export default function Articles() {
     const text = await file.text();
     const rawData = JSON.parse(text);
 
-    type RawArticle = {
-      headline: string;
-      datePublished: string;
-      datePublishedRaw: string;
-      dateModified: string;
-      isMdx?: boolean,
-      commonSideEffects: string[]
-      dateModifiedRaw: string;
-      authors: {
-        name: string;
-        nameRaw: string;
-      }[];
-      breadcrumbs: {
-        name: string;
-        url: string;
-      }[];
-      inLanguage: string;
-      description: string;
-      articleBody: string;
-      articleBodyHtml: string;
-      canonicalUrl: string;
-      url: string;
-      metadata: {
-        dateDownloaded: string;
-        probability: number;
-        _type: string;
-      };
-    }
-
     const formatted: IArticles[] = rawData.map((item: RawArticle) => ({
       id: Math.random().toString(36).substring(2, 15),
       title: item.headline,
       slug: generateSlug(item.headline),
-      tags: item.commonSideEffects,
+      tags: item.productDetails.commonSideEffects,
       description: item.description || "",
-      author: item.authors[0].name || "",
+      author: "",
       language: item.inLanguage || "english",
-      headerImage: "",
+      headerImage: item.productDetails.imageUrls[0] || "",
       publishDate: new Date().toISOString(),
-      mdxString: item.isMdx ? item.articleBodyHtml : formatSpecialContent(turndownService.turndown(item.articleBodyHtml)) || "",
+      mdxString: generateMarkdown(item),
       canonical: item.canonicalUrl || "",
-      openGraphImage: "",
+      openGraphImage: item.productDetails.imageUrls[0] || "",
       openGraphTitle: item.headline || "",
       openGraphDescription: item.description || "",
     }));
