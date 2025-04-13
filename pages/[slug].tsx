@@ -29,7 +29,7 @@ const Article = ({ articleData, locale }: ArticleProps) => {
     const [headings, setHeadings] = useState<string[]>([]);
 
     const [showAssessMent, setShowAssessMent] = useState(false);
-    const [currImage, setCurrImage] = useState(articleData?.images[0] || "");
+    const [currImage, setCurrImage] = useState(articleData?.images ? articleData.images[0] : "");
 
     useEffect(() => {
         async function loadMDX() {
