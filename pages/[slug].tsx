@@ -29,7 +29,7 @@ const Article = ({ articleData, locale }: ArticleProps) => {
     const [headings, setHeadings] = useState<string[]>([]);
 
     const [showAssessMent, setShowAssessMent] = useState(false);
-    const [currImage, setCurrImage] = useState(articleData.images[0]);
+    const [currImage, setCurrImage] = useState(articleData?.images[0] || "");
 
     useEffect(() => {
         async function loadMDX() {
@@ -110,7 +110,7 @@ const Article = ({ articleData, locale }: ArticleProps) => {
                                         className="w-full h-[300px] object-cover rounded-lg"
                                     />
                                 </div>
-                                {articleData.images.map((image, i) => (
+                                {articleData?.images && articleData?.images?.map((image, i) => (
                                     <div key={i} onClick={() => setCurrImage(image)}
                                         className={`${currImage === image ? "border p-1 h-fit rounded-lg" : ""}`}
                                     >
