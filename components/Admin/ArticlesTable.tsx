@@ -23,7 +23,7 @@ import {
     AlertDialogHeader,
     AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
-import { ArrowUpDown, ChevronDown, Import, Loader2, MoreHorizontal } from "lucide-react"
+import { ArrowUpDown, ChevronDown, Eye, Import, Loader2, MoreHorizontal, Pencil } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Checkbox } from "@/components/ui/checkbox"
 import {
@@ -148,43 +148,45 @@ const createColumns = ({
             cell: ({ row }) => {
                 const article = row.original;
                 return (
-                    <DropdownMenu>
-                        <DropdownMenuTrigger asChild>
-                            <Button variant="ghost" className="h-8 w-8 p-0">
-                                <span className="sr-only">Open menu</span>
-                                <MoreHorizontal />
-                            </Button>
-                        </DropdownMenuTrigger>
-                        <DropdownMenuContent align="end">
-                            <DropdownMenuLabel>Actions</DropdownMenuLabel>
-                            <DropdownMenuItem
-                                asChild >
-                                <Link
-                                    href={`/admin/article/edit/${row.original.id}?tab=basic`}
-                                >
-
-                                    Edit
-                                </Link>
-                            </DropdownMenuItem>
-                            <DropdownMenuItem
-                                asChild
+                    <div className="flex space-x-2 pl-5">
+                        <Button variant="outline" size="icon">
+                            <Link
+                                href={`/admin/article/edit/${row.original.id}?tab=basic`}
+                                target="_blank"
+                                referrerPolicy="no-referrer"
                             >
-                                <Link
-                                    href={`/${row.getValue("language")}/${row.getValue("slug")}`}
-                                >
-                                    View
-                                </Link>
-                            </DropdownMenuItem>
-                            <DropdownMenuSeparator />
-                            <DropdownMenuItem
-                                onClick={() => {
-                                    setIsDeleteModalOpen(true)
-                                    setSelectedRow(article)
-                                }}
-                            >Delete</DropdownMenuItem>
-                            <DropdownMenuItem>Block</DropdownMenuItem>
-                        </DropdownMenuContent>
-                    </DropdownMenu >
+                                <Pencil />
+                            </Link>
+                        </Button>
+                        <Button variant="outline" size="icon">
+                            <Link
+                                href={`/${row.getValue("language")}/${row.getValue("slug")}`}
+                                target="_blank"
+                                referrerPolicy="no-referrer"
+                            >
+                                <Eye />
+                            </Link>
+                        </Button>
+                        <DropdownMenu>
+                            <DropdownMenuTrigger asChild>
+                                <Button variant="ghost" className="h-8 w-8 p-0">
+                                    <span className="sr-only">Open menu</span>
+                                    <MoreHorizontal />
+                                </Button>
+                            </DropdownMenuTrigger>
+                            <DropdownMenuContent align="end">
+                                <DropdownMenuLabel>Actions</DropdownMenuLabel>
+                                <DropdownMenuSeparator />
+                                <DropdownMenuItem
+                                    onClick={() => {
+                                        setIsDeleteModalOpen(true)
+                                        setSelectedRow(article)
+                                    }}
+                                >Delete</DropdownMenuItem>
+                                <DropdownMenuItem>Block</DropdownMenuItem>
+                            </DropdownMenuContent>
+                        </DropdownMenu >
+                    </div>
                 )
             },
         },
@@ -194,15 +196,19 @@ const createColumns = ({
 export default function ArticleTable({
     data,
     extractedData,
+    selectedArticles,
+    handleCheckboxChange,
     setExtractedData,
     setData,
     handleOnFileChange,
 }: {
     data: Articles[]
+    selectedArticles: Articles[]
     extractedData: Articles[] | null
     setExtractedData: React.Dispatch<React.SetStateAction<Articles[] | null>>
     setData: React.Dispatch<React.SetStateAction<Articles[] | null | undefined>>
     handleOnFileChange: (e: React.ChangeEvent<HTMLInputElement>) => void
+    handleCheckboxChange: (article: Articles) => void
 }) {
     const [sorting, setSorting] = React.useState<SortingState>([])
     const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>(
@@ -214,18 +220,17 @@ export default function ArticleTable({
     const [rowSelection, setRowSelection] = React.useState({})
     const [isDeleteModalOpen, setIsDeleteModalOpen] = React.useState(false);
     const [isImportModalOpen, setIsImportModalOpen] = React.useState(false);
-    const [selectedRow, setSelectedRow] = React.useState<Articles | null>(null)
-
+    const [selectedRow, setSelectedRow] = React.useState<Articles | null>(null);
 
     // Sabe extracted data to database
     const handleSaveExtractedData = async () => {
-        if (!extractedData) return;
+        if (!selectedArticles) return;
         setIsLoading(true);
         try {
             const res = await fetch("/api/article/many", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ articles: extractedData })
+                body: JSON.stringify({ articles: selectedArticles })
             });
 
             if (res.status === 200) {
@@ -453,17 +458,25 @@ export default function ArticleTable({
                                     onChange={handleOnFileChange}
                                     className="my-6 h-12"
                                 />
-                                {
-                                    extractedData && (
-                                        <ul className="space-y-1">
-                                            {extractedData.map((article, index) => (
-                                                <li key={index} className="capitalize">
-                                                    {index + 1}. {article.title}
-                                                </li>
-                                            ))}
-                                        </ul>
-                                    )
-                                }
+                                {extractedData && (
+                                    <ul className="space-y-1 mb-5">
+                                        {extractedData.map((article, index) => (
+                                            <li key={index} className="capitalize flex items-center gap-2 text-black">
+                                                <input
+                                                    type="checkbox"
+                                                    className="text-black"
+                                                    checked={selectedArticles.includes(article)}
+                                                    onChange={() => handleCheckboxChange(article)}
+                                                />
+                                                <span>{index + 1}. {article.title}</span>
+                                            </li>
+                                        ))}
+                                    </ul>
+                                )}
+
+                                <span className="text-gray-500 mt-5">
+                                    Selected: {selectedArticles.length} of {extractedData?.length}
+                                </span>
                             </AlertDialogDescription>
                         </AlertDialogHeader>
                         <AlertDialogFooter>

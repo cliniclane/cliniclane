@@ -15,7 +15,7 @@ const components = {
     <h3 className="text-xl font-semibold my-5" {...props} />
   ),
   h2: (props: React.HTMLAttributes<HTMLHeadingElement>) => (
-    <h2 className="text-xl font-semibold my-5 underline" {...props} />
+    <h2 className="text-xl font-semibold my-5" {...props} />
   ),
   p: (props: React.HTMLAttributes<HTMLParagraphElement>) => {
     const dir = isRTL(props.children as string) ? "rtl" : "ltr";

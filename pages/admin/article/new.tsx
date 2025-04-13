@@ -14,6 +14,7 @@ const newArticle = {
   title: "",
   description: "",
   tags: [],
+  images: ["", "", ""],
   language: "english",
   mdxString: `#Heading`,
   slug: "",
@@ -37,6 +38,7 @@ const NewArticle = () => {
   ];
 
   const [article, setArticle] = useState<Articles | null>(newArticle);
+  const [images, setImages] = useState(["", "", ""])
   const [mdxString, setMdxString] = useState<string | undefined>(undefined);
   const [tags, setTags] = useState<string[]>([]);
   const [inputValue, setInputValue] = useState("");
@@ -111,6 +113,13 @@ const NewArticle = () => {
     if (!router.query.tab) router.push(`/admin/article/new?tab=basic`);
   }, [tab]);
 
+  useEffect(() => {
+    if (article) {
+      const a = { ...article, images }
+      setArticle(a)
+    }
+  }, [images])
+
   return (
     <div className="flex">
       <Sidebar selected="articles" />
@@ -148,6 +157,8 @@ const NewArticle = () => {
             <div className="w-full">
               {activeTab === "basic" ? (
                 <BasicEditForm
+                  images={images}
+                  setImages={setImages}
                   article={article}
                   loading={loading}
                   handleChange={handleChange}

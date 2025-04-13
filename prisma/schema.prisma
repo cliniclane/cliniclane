@@ -27,6 +27,7 @@ model Articles {
   author               String
   language             String?
   headerImage          String
+  images               String[]
   publishDate          String
   mdxString            String
   canonical            String

@@ -61,6 +61,17 @@ export default function Articles() {
   const { articles, setArticles } = useArticlesStore()
   const { data: session, status } = useSession()
   const [extractedData, setExtractedData] = useState<IArticles[] | null>(null);
+  const [selectedArticles, setSelectedArticles] = useState<IArticles[]>([]);
+
+  const handleCheckboxChange = (article: IArticles) => {
+    setSelectedArticles(
+      selectedArticles.includes(article)
+        ? selectedArticles.filter((a) => a !== article)
+        : [...selectedArticles, article]
+
+    )
+  };
+
 
   useEffect(() => {
     if (status === "authenticated") {
@@ -79,7 +90,7 @@ export default function Articles() {
   };
 
   function generateMarkdown(article: RawArticle): string {
-    const { description, productDetails } = article;
+    const { productDetails } = article;
     const pd = productDetails;
 
     const parseStringArray = (input: string): string[] => {
@@ -105,7 +116,7 @@ export default function Articles() {
     const uses = parseStringArray(pd.uses[0] || "[]");
 
     const markdown = `
-  ## 💊 Product Details
+  ## PRODUCT DETAILS
   - **💰 Price:** ${pd.price}
   - **🧪 Salt Composition:** ${pd.saltComposition}
   - **📦 Storage:** ${pd.storage}
@@ -113,37 +124,60 @@ export default function Articles() {
   
   ---
   
-  ## 📝 Description
-  ${description}
+  ## 📝 PRODICT INTRODUCTION
+  ${productDetails.productIntroduction}
+
+  ---
   
-  ## ⚙️ How It Works
-  ${pd.howItWorks}
-  
-  ## 🎯 Uses
+  ## 🎯 USES
   ${uses.map((item, i) => `${i + 1}. ${item}`).join('\n')}
+
+  <br />
   
-  ## 📥 How to Use
-  ${pd.howToUse}
-  
-  ## ⚠️ Common Side Effects
-  ${pd.commonSideEffects.filter(Boolean).map(effect => `- ${effect}`).join('\n')}
-  
-  ## 🛡️ Safety Advice
-  ${Object.entries(safetyAdviceObj)
-        .map(([key, val]) => `### 🧷 ${key}\n- **Status:** ${val.Status}\n- **Details:** ${val.Details}`)
-        .join('\n\n')}
-  
-  ## ⏱️ Missed Dosage
-  ${pd.missedDosage}
-  
-  ## 💡 Quick Tips
-  ${pd.quickTips.filter(Boolean).map(tip => `- ${tip}`).join('\n')}
-  
-  ## 🌟 Benefits
+  ## BENEFITS OF ${pd.productName.toUpperCase()}
   ${Object.entries(benefits)
         .map(([key, val]) => `### ✅ ${key}\n${val}`)
         .join('\n\n')}
+
+  ---
   
+  ## ⚠️ SIDE EFFECTS OF ${pd.productName.toUpperCase()}
+  ${pd.sideEffects}
+
+  ${pd.commonSideEffects.filter(Boolean).map(effect => `- ${effect}`).join('\n')}
+  
+  ---
+  
+  ## 📥 HOW TO USE ${pd.productName.toUpperCase()}
+  ${pd.howToUse}
+
+  ---
+
+  ## ⚙️ HOW ${pd.productName.toUpperCase()} WORKS
+  ${pd.howItWorks}
+
+  ---
+
+  ## 🛡️ SAFETY ADVICE
+
+  <br />
+
+  ${Object.entries(safetyAdviceObj)
+        .map(([key, val]) => `### ⚠️ ${key}\n- **Status:** ${val.Status}\n- **Details:** ${val.Details}`)
+        .join('\n\n')}
+
+  ---
+  
+  ## ⏱️ WHAT IF YOU FORGET TO TAKE ${pd.productName.toUpperCase()}
+  ${pd.missedDosage}
+
+  ---
+  
+  ## 💡 QUICK TIPS
+  ${pd.quickTips.filter(Boolean).map(tip => `- ${tip}`).join('\n')}
+  
+  ---
+
   ## ❓ FAQs
   ${pd.faqs}
   
@@ -169,6 +203,7 @@ export default function Articles() {
       language: item.inLanguage || "english",
       headerImage: item.productDetails.imageUrls[0] || "",
       publishDate: new Date().toISOString(),
+      images: item.productDetails.imageUrls,
       mdxString: generateMarkdown(item),
       canonical: item.canonicalUrl || "",
       openGraphImage: item.productDetails.imageUrls[0] || "",
@@ -213,6 +248,7 @@ export default function Articles() {
     });
 
     setExtractedData(formatted);
+    setSelectedArticles(formatted)
 
   };
 
@@ -246,7 +282,10 @@ export default function Articles() {
         </div>
 
         {/* Responsive Table */}
-        {articles && <ArticleTable setExtractedData={setExtractedData} extractedData={extractedData} handleOnFileChange={handleFileChange} data={articles} setData={setArticles} />}
+        {articles && <ArticleTable
+          selectedArticles={selectedArticles}
+          handleCheckboxChange={handleCheckboxChange}
+          setExtractedData={setExtractedData} extractedData={extractedData} handleOnFileChange={handleFileChange} data={articles} setData={setArticles} />}
       </div>
     </div>
   );

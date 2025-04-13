@@ -2,7 +2,6 @@ import Footer from "@/components/Footer";
 import Navbar from "@/components/Navbar";
 import Image from "next/image";
 import { BsArrowRight } from "react-icons/bs";
-import { IoCopyOutline } from "react-icons/io5";
 import { useEffect, useState } from "react";
 import { serialize } from "next-mdx-remote/serialize";
 import MDXRenderer from "../components/MDXRenderer";
@@ -30,6 +29,7 @@ const Article = ({ articleData, locale }: ArticleProps) => {
     const [headings, setHeadings] = useState<string[]>([]);
 
     const [showAssessMent, setShowAssessMent] = useState(false);
+    const [currImage, setCurrImage] = useState(articleData.images[0]);
 
     useEffect(() => {
         async function loadMDX() {
@@ -95,55 +95,53 @@ const Article = ({ articleData, locale }: ArticleProps) => {
                 <div className="flex flex-col">
                     {/* Title */}
                     <h1 className="font-bold text-5xl md:w-[80%]">{articleData.title}</h1>
-                    {/* Tags */}
-                    <div className="flex flex-wrap mt-5">
-                        {articleData.tags.map((tag, i) => (
-                            <span
-                                key={i}
-                                className="inline-block mt-2 bg-gray-200 px-2 py-1 text-sm text-gray-700 rounded-sm mr-2"
-                            >
-                                {tag}
-                            </span>
-                        ))}
-                    </div>
 
-                    {/* Description */}
-                    <span className="text-2xl mt-10 md:w-[80%] text-gray-800">
-                        {articleData.description}
-                    </span>
-                    {/* Image */}
-                    <div className="mt-10">
-                        <div className="relative">
-                            <Image
-                                src={articleData.headerImage} // Change to actual image path
-                                alt="Blog Header"
-                                width={1200} // Fixed width
-                                height={600} // Fixed height
-                                className="w-full h-[500px] object-cover rounded-lg"
-                            />
-                            {/* Bottom Left Text */}
-                            <div className="absolute bottom-4 left-4 text-white text-sm">
-                                <p className="font-light">Written by</p>
-                                <p className="font-semibold">{articleData.author || "Sid"}</p>
+
+                    <div className="grid md:grid-cols-2 gap-10">
+                        {/* Image */}
+                        <div className="mt-10">
+                            <div className="grid grid-cols-3 grid-rows-2 gap-3">
+                                <div className="col-span-3">
+                                    <Image
+                                        src={currImage} // Change to actual image path
+                                        alt="Blog Header"
+                                        width={500} // Fixed width
+                                        height={400} // Fixed height
+                                        className="w-full h-[300px] object-cover rounded-lg"
+                                    />
+                                </div>
+                                {articleData.images.map((image, i) => (
+                                    <div key={i} onClick={() => setCurrImage(image)}
+                                        className={`${currImage === image ? "border p-1 h-fit rounded-lg" : ""}`}
+                                    >
+                                        <Image
+                                            src={image} // Change to actual image path
+                                            alt="Blog Header"
+                                            width={200} // Fixed width
+                                            height={100} // Fixed height
+                                            className="w-full h-[100px] object-cover rounded-lg"
+                                        />
+                                    </div>
+                                ))
+                                }
+
                             </div>
-                            <div className="absolute bottom-4 left-40 text-white text-sm">
-                                <p className="font-light">Published on</p>
-                                <p className="font-semibold">
-                                    {new Date(articleData.publishDate).toDateString()}
-                                </p>
-                            </div>
-                            {/* Social Icons & Copy Link */}
-                            <div className="absolute bottom-4 right-4 flex gap-2">
-                                <button className="border hover:bg-white hover:text-black border-white p-2 text-sm rounded-md text-white flex items-center gap-2">
-                                    <IoCopyOutline />
-                                    Copy link
-                                </button>
-                            </div>
+                        </div>
+                        {/* Tags */}
+                        <div className="flex h-fit flex-wrap mt-5 p-3">
+                            {articleData.tags.filter(item => item !== "").map((tag, i) => (
+                                <span
+                                    key={i}
+                                    className="inline-block mt-2 bg-gray-200 px-2 py-1 text-sm text-gray-700 rounded-sm mr-2"
+                                >
+                                    {tag}
+                                </span>
+                            ))}
                         </div>
                     </div>
                 </div>
                 {/* Body */}
-                <div className="grid grid-cols-1 md:grid-cols-3 md:gap-32 mt-16">
+                <div className="grid grid-cols-1 md:grid-cols-3 md:gap-32">
                     {/* Feed */}
                     <div className="col-span-2 flex flex-col leading-8">
                         {mdxContent ? (

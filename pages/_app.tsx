@@ -5,6 +5,7 @@ import type { AppProps } from "next/app";
 import { Toaster } from "react-hot-toast";
 import { appWithTranslation } from 'next-i18next';
 import { StoreProvider as ArticlesStoreProvider } from "@/lib/store/articles.store";
+import '@/lib/i18n';
 
 const App = ({
   Component,

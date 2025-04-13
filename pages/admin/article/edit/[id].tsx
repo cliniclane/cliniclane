@@ -24,6 +24,7 @@ const EditArticle = () => {
   const [mdxString, setMdxString] = useState<string | undefined>(undefined);
   const [tags, setTags] = useState<string[]>([]);
   const [inputValue, setInputValue] = useState("");
+  const [images, setImages] = useState(["", "", ""])
 
   const addTag = (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.key === "Enter" && inputValue.trim() !== "") {
@@ -108,6 +109,13 @@ const EditArticle = () => {
       router.push(`/admin/article/edit/${id}?tab=basic`);
   }, [tab, id]);
 
+  useEffect(() => {
+    if (article) {
+      const a = { ...article, images }
+      setArticle(a)
+    }
+  }, [images])
+
   return (
     <div className="flex">
       <Sidebar selected="articles" />
@@ -145,6 +153,8 @@ const EditArticle = () => {
             <div className="w-full">
               {activeTab === "basic" ? (
                 <BasicEditForm
+                  images={images}
+                  setImages={setImages}
                   article={article}
                   loading={loading}
                   handleChange={handleChange}

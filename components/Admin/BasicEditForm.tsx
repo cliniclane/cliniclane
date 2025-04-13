@@ -14,10 +14,13 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
 import toast from "react-hot-toast";
+import { Input } from "../ui/input";
 
 interface IProps {
   article: Articles;
   mdxString: string | undefined;
+  images: string[];
+  setImages: React.Dispatch<React.SetStateAction<string[]>>;
   handleChange: (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>
   ) => void;
@@ -29,6 +32,8 @@ interface IProps {
 const BasicEditForm: FC<IProps> = ({
   article,
   mdxString,
+  images,
+  setImages,
   handleChange,
   setMdxString,
   handleSave,
@@ -232,6 +237,52 @@ const BasicEditForm: FC<IProps> = ({
           </div>
         </div>
 
+        <ul className="mt-7 space-y-5">
+          <li>
+            <Input
+              type="text"
+              name="image0"
+              id="image0"
+              placeholder="Image URL 1"
+              value={images[0]}
+              onChange={(e) => {
+                const updatedImages = [...images]; // clone the array
+                updatedImages[0] = e.target.value;
+                setImages(updatedImages); // set new state
+              }}
+            />
+          </li>
+          <li>
+            <Input
+              type="text"
+              name="image1"
+              id="image1"
+              placeholder="Image URL 2"
+              value={images[1]}
+              onChange={(e) => {
+                const updatedImages = [...images]; // clone the array
+                updatedImages[1] = e.target.value;
+                setImages(updatedImages); // set new state
+              }}
+
+            />
+          </li>
+          <li>
+            <Input
+              type="text"
+              name="image2"
+              id="image2"
+              placeholder="Image URL 3"
+              value={images[2]}
+              onChange={(e) => {
+                const updatedImages = [...images]; // clone the array
+                updatedImages[2] = e.target.value;
+                setImages(updatedImages); // set new state
+              }}
+
+            />
+          </li>
+        </ul>
       </div>
       <div className="mb-6 mt-16 h-[110vh]">
         <label
