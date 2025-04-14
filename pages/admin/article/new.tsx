@@ -16,6 +16,7 @@ const newArticle = {
   tags: [],
   images: ["", "", ""],
   language: "english",
+  languages: [],
   mdxString: `#Heading`,
   slug: "",
   headerImage: "",
@@ -23,6 +24,7 @@ const newArticle = {
   openGraphDescription: "",
   openGraphImage: "",
   canonical: "",
+  translatedFromId: null,
 };
 
 const NewArticle = () => {
