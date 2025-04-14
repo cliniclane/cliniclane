@@ -16,6 +16,10 @@ export default async function handler(
     try {
       const articles = await prisma.articles.findUnique({
         where: { id: id as string },
+        include: {
+          translations: true,
+          translatedFrom: true,
+        },
       });
 
       res.status(200).json(articles);

@@ -19,13 +19,14 @@ model Users {
 }
 
 model Articles {
-  id                   String   @id @map("_id")
+  id                   String     @id @map("_id")
   title                String
-  slug                 String   @unique
+  slug                 String     @unique
   tags                 String[]
   description          String
   author               String
   language             String?
+  languages            String[]   @default(["english"])
   headerImage          String
   images               String[]
   publishDate          String
@@ -34,6 +35,10 @@ model Articles {
   openGraphImage       String?
   openGraphTitle       String?
   openGraphDescription String?
+  // Self-referential relation for translations
+  translations         Articles[] @relation("ArticleTranslations")
+  translatedFrom       Articles?  @relation("ArticleTranslations", fields: [translatedFromId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  translatedFromId     String?    @map("translatedFromId")
 }
 
 model Languages {

@@ -2,10 +2,24 @@ import BasicEditForm from "@/components/Admin/BasicEditForm";
 import SEOEditForm from "@/components/Admin/SEOEditForm";
 import Sidebar from "@/components/Admin/Sidebar";
 import { useArticlesStore } from "@/lib/store/articles.store";
-import { Articles } from "@prisma/client";
+import { Articles, Languages, Prisma } from "@prisma/client";
 import { useRouter } from "next/router";
 import React, { ChangeEvent, useEffect, useState } from "react";
 import toast, { Toaster } from "react-hot-toast";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { Button } from "@/components/ui/button";
+import { Globe } from "lucide-react";
+import { useSession } from "next-auth/react";
+
+type ArticleWithRelations = Prisma.ArticlesGetPayload<{
+  include: { translations: true; translatedFrom: true };
+}>;
+
 
 const EditArticle = () => {
   const router = useRouter();
@@ -19,12 +33,19 @@ const EditArticle = () => {
     { name: "SEO", disabled: false },
   ];
 
-  const [article, setArticle] = useState<Articles | null>(null);
+  const [article, setArticle] = useState<ArticleWithRelations | null>(null);
   const { setArticles } = useArticlesStore()
   const [mdxString, setMdxString] = useState<string | undefined>(undefined);
   const [tags, setTags] = useState<string[]>([]);
   const [inputValue, setInputValue] = useState("");
   const [images, setImages] = useState(["", "", ""])
+  const [currLanguage, setCurrLanguage] = useState<Languages | null>(null);
+  const [languages, setLanguages] = useState<Languages[] | null>(null);
+  const [currentLangId, setCurrentLangId] = useState("");
+  const [allVersions, setAllVersions] = useState<Articles[] | null>(null);
+  const { data: session } = useSession()
+
+
 
   const addTag = (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.key === "Enter" && inputValue.trim() !== "") {
@@ -40,9 +61,9 @@ const EditArticle = () => {
     setTags(tags.filter((tag) => tag !== tagToRemove));
   };
 
-  const handleChange = (
+  const handleChange: (
     e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>
-  ) => {
+  ) => void = (e) => {
     const { name, value } = e.target;
 
     setArticle((prev) => {
@@ -50,6 +71,7 @@ const EditArticle = () => {
       return { ...prev, [name]: value };
     });
   };
+
 
   const updateArticle = async () => {
     setLoading(true);
@@ -103,6 +125,20 @@ const EditArticle = () => {
     if (id) fetchArticles();
   }, [id]);
 
+  // Fetch users from API
+  const fetchLanguages = async () => {
+    const res = await fetch('/api/languages')
+    const data = await res.json()
+    setLanguages(data)
+    setCurrLanguage(data[0])
+  }
+
+  useEffect(() => {
+    if (!languages && session) {
+      fetchLanguages()
+    }
+  }, [languages, session]);
+
   useEffect(() => {
     if (tab && !activeTab) setActiveTab(tab as string);
     if (!router.query.tab && id)
@@ -115,6 +151,41 @@ const EditArticle = () => {
       setArticle(a)
     }
   }, [images])
+
+  useEffect(() => {
+    if (article) {
+      const a = { ...article, mdxString: mdxString || "" }
+      setArticle(a)
+    }
+  }, [mdxString])
+
+
+  useEffect(() => {
+    if (article) {
+      const allVersions = [
+        article,
+        ...(article?.translations || []),
+        ...(article?.translatedFrom ? [article?.translatedFrom] : [])
+      ];
+
+      setAllVersions(allVersions)
+      setCurrentLangId(article.id)
+
+    }
+  }, [article])
+
+  useEffect(() => {
+    if (currLanguage) {
+      console.log(allVersions)
+      const LangId = article?.translations.find((article) => article.language === currLanguage.code)?.id
+      console.log(LangId)
+      setCurrentLangId(LangId || article?.id || "")
+
+    }
+  }, [currLanguage])
+
+  const currentArticle = allVersions?.find(a => a.id === currentLangId);
+
 
   return (
     <div className="flex">
@@ -145,17 +216,42 @@ const EditArticle = () => {
           </ul>
         </div>
 
+
         {/* Tab Content */}
         {article && (
           <div className="flex flex-col w-full px-6 md:pl-20 md:pr-12 py-5 pb-36">
-            <p className="text-2xl font-medium underline text-gray-500">Edit</p>
+            <div className="flex items-center justify-between w-full">
+
+              <p className="text-2xl font-medium underline text-gray-500">Edit</p>
+
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button variant="outline" className="flex items-center space-x-2">
+                    <Globe className="w-4 h-4 mr-2" />
+                    <span className="capitalize">{currLanguage?.name}</span>
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end">
+                  {languages?.map((loc) => (
+                    <DropdownMenuItem
+                      key={loc.code}
+                      onClick={() => setCurrLanguage(loc)}
+                      className="capitalize"
+                    >
+                      {loc.name}
+                    </DropdownMenuItem>
+                  ))}
+                </DropdownMenuContent>
+              </DropdownMenu>
+
+            </div>
 
             <div className="w-full">
-              {activeTab === "basic" ? (
+              {activeTab === "basic" && currentArticle ? (
                 <BasicEditForm
                   images={images}
                   setImages={setImages}
-                  article={article}
+                  article={currentArticle}
                   loading={loading}
                   handleChange={handleChange}
                   setMdxString={setMdxString}
@@ -180,7 +276,7 @@ const EditArticle = () => {
         )}
       </div>
       <Toaster position="top-center" reverseOrder={false} />
-    </div>
+    </div >
   );
 };
 

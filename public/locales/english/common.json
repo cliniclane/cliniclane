@@ -25,22 +25,18 @@
     "by": "by",
     "comments": "Comments",
     "relatedPosts": "Related Posts",
-    "footer": {
-        "about": "About Us",
-        "contact": "Contact Us",
-        "privacy": "Privacy Policy",
-        "advertising": "Advertising Policy",
-        "sitemap": "Sitemap",
-        "medical": "Medical Affairs",
-        "newsletterTitle": "Get our wellness newsletter",
-        "newsletterDesc": "Filter out the noise and nurture your inbox with health and wellness advice that’s inclusive and rooted in medical expertise.",
-        "placeholder": "Enter your email",
-        "subscribe": "Subscribe",
-        "privacyText": "Your",
-        "privacyLink": "privacy",
-        "copyright": "© 2025 Cliniclane Media LLC. All rights reserved.",
-        "disclaimer": "Our website services, content, and products are for informational purposes only. Cliniclane Media does not provide medical advice, diagnosis, or treatment."
-    },
+    "privacy": "Privacy Policy",
+    "advertising": "Advertising Policy",
+    "sitemap": "Sitemap",
+    "medical": "Medical Affairs",
+    "newsletterTitleFooter": "Get our wellness newsletter",
+    "newsletterDesc": "Filter out the noise and nurture your inbox with health and wellness advice that’s inclusive and rooted in medical expertise.",
+    "placeholder": "Enter your email",
+    "subscribe": "Subscribe",
+    "privacyText": "Your",
+    "privacyLink": "privacy",
+    "copyright": "© 2025 Cliniclane Media LLC. All rights reserved.",
+    "disclaimer": "Our website services, content, and products are for informational purposes only. Cliniclane Media does not provide medical advice, diagnosis, or treatment.",
     "mentalHealth": "Mental Health",
     "creators": "Creators",
     "health": "Health",
@@ -49,9 +45,7 @@
     "mostPopularDesc": "The latest news, tips and advice to help you run your business with less fuss",
     "readAllArticles": "Read All Articles",
     "emailPlaceholder": "Email Address*",
-    "newsletterTitle": {
-        "part1": "Join our",
-        "highlight": "30 days",
-        "part2": "detox program"
-    }
+    "newsletterTitlePart1": "Join our",
+    "newsletterTitleHighlight": "30 days",
+    "newsletterTitlePart2": "detox program"
 }

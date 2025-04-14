@@ -17,9 +17,9 @@ const Newsletter = () => {
         </button>
       </div>
       <h2 className="mt-10 text-3xl md:text-4xl font-bold">
-        {t("newsletterTitle.part1")}{" "}
-        <span className="text-green-400">{t("newsletterTitle.highlight")}</span>{" "}
-        {t("newsletterTitle.part2")}
+        {t("newsletterTitlePart1")}{" "}
+        <span className="text-green-400">{t("newsletterTitleHighlight")}</span>{" "}
+        {t("newsletterTitlePart2")}
       </h2>
     </div>
   );

@@ -25,22 +25,18 @@
     "by": "par",
     "comments": "Commentaires",
     "relatedPosts": "Articles connexes",
-    "footer": {
-        "about": "À propos de nous",
-        "contact": "Contactez-nous",
-        "privacy": "Politique de confidentialité",
-        "advertising": "Politique publicitaire",
-        "sitemap": "Plan du site",
-        "medical": "Affaires médicales",
-        "newsletterTitle": "Recevez notre newsletter bien-être",
-        "newsletterDesc": "Filtrez le superflu et enrichissez votre boîte de réception avec des conseils santé inclusifs et fondés sur une expertise médicale.",
-        "placeholder": "Entrez votre e-mail",
-        "subscribe": "S'abonner",
-        "privacyText": "Votre",
-        "privacyLink": "confidentialité",
-        "copyright": "© 2025 Cliniclane Media LLC. Tous droits réservés.",
-        "disclaimer": "Nos services, contenus et produits sont uniquement à des fins d'information. Cliniclane Media ne fournit pas de conseils, diagnostics ou traitements médicaux."
-    },
+    "privacy": "Politique de confidentialité",
+    "advertising": "Politique publicitaire",
+    "sitemap": "Plan du site",
+    "medical": "Affaires médicales",
+    "newsletterTitleFooter": "Recevez notre newsletter bien-être",
+    "newsletterDesc": "Filtrez le superflu et enrichissez votre boîte de réception avec des conseils santé inclusifs et fondés sur une expertise médicale.",
+    "placeholder": "Entrez votre e-mail",
+    "subscribe": "S'abonner",
+    "privacyText": "Votre",
+    "privacyLink": "confidentialité",
+    "copyright": "© 2025 Cliniclane Media LLC. Tous droits réservés.",
+    "disclaimer": "Nos services, contenus et produits sont uniquement à des fins d'information. Cliniclane Media ne fournit pas de conseils, diagnostics ou traitements médicaux.",
     "mentalHealth": "Santé mentale",
     "creators": "Créateurs",
     "health": "Santé",
@@ -49,9 +45,7 @@
     "mostPopularDesc": "Les dernières nouvelles, astuces et conseils pour gérer votre entreprise plus facilement",
     "readAllArticles": "Lire tous les articles",
     "emailPlaceholder": "Adresse e-mail*",
-    "newsletterTitle": {
-        "part1": "Rejoignez notre",
-        "highlight": "programme de 30 jours",
-        "part2": "de désintoxication"
-    }
+    "newsletterTitlePart1": "Rejoignez notre",
+    "newsletterTitleHighlight": "programme de 30 jours",
+    "newsletterTitlePart2": "de désintoxication"
 }
