@@ -2,7 +2,7 @@ import BasicEditForm from "@/components/Admin/BasicEditForm";
 import SEOEditForm from "@/components/Admin/SEOEditForm";
 import Sidebar from "@/components/Admin/Sidebar";
 import { useArticlesStore } from "@/lib/store/articles.store";
-import { Articles, Languages, Prisma } from "@prisma/client";
+import { Articles, Languages } from "@prisma/client";
 import { useRouter } from "next/router";
 import React, { ChangeEvent, useEffect, useState } from "react";
 import toast, { Toaster } from "react-hot-toast";
@@ -16,9 +16,6 @@ import { Button } from "@/components/ui/button";
 import { Globe } from "lucide-react";
 import { useSession } from "next-auth/react";
 
-type ArticleWithRelations = Prisma.ArticlesGetPayload<{
-  include: { translations: true; translatedFrom: true };
-}>;
 
 
 const EditArticle = () => {
@@ -33,7 +30,7 @@ const EditArticle = () => {
     { name: "SEO", disabled: false },
   ];
 
-  const [article, setArticle] = useState<ArticleWithRelations | null>(null);
+  const [article, setArticle] = useState<Articles | null>(null);
   const { setArticles } = useArticlesStore()
   const [mdxString, setMdxString] = useState<string | undefined>(undefined);
   const [tags, setTags] = useState<string[]>([]);
@@ -41,8 +38,6 @@ const EditArticle = () => {
   const [images, setImages] = useState(["", "", ""])
   const [currLanguage, setCurrLanguage] = useState<Languages | null>(null);
   const [languages, setLanguages] = useState<Languages[] | null>(null);
-  const [currentLangId, setCurrentLangId] = useState("");
-  const [allVersions, setAllVersions] = useState<Articles[] | null>(null);
   const { data: session } = useSession()
 
 
@@ -160,33 +155,6 @@ const EditArticle = () => {
   }, [mdxString])
 
 
-  useEffect(() => {
-    if (article) {
-      const allVersions = [
-        article,
-        ...(article?.translations || []),
-        ...(article?.translatedFrom ? [article?.translatedFrom] : [])
-      ];
-
-      setAllVersions(allVersions)
-      setCurrentLangId(article.id)
-
-    }
-  }, [article])
-
-  useEffect(() => {
-    if (currLanguage) {
-      console.log(allVersions)
-      const LangId = article?.translations.find((article) => article.language === currLanguage.code)?.id
-      console.log(LangId)
-      setCurrentLangId(LangId || article?.id || "")
-
-    }
-  }, [currLanguage])
-
-  const currentArticle = allVersions?.find(a => a.id === currentLangId);
-
-
   return (
     <div className="flex">
       <Sidebar selected="articles" />
@@ -247,11 +215,11 @@ const EditArticle = () => {
             </div>
 
             <div className="w-full">
-              {activeTab === "basic" && currentArticle ? (
+              {activeTab === "basic" ? (
                 <BasicEditForm
                   images={images}
                   setImages={setImages}
-                  article={currentArticle}
+                  article={article}
                   loading={loading}
                   handleChange={handleChange}
                   setMdxString={setMdxString}

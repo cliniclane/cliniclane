@@ -160,7 +160,7 @@ const createColumns = ({
                         </Button>
                         <Button variant="outline" size="icon">
                             <Link
-                                href={`/${row.getValue("language")}/${row.getValue("slug")}`}
+                                href={`/${row.getValue("slug")}`}
                                 target="_blank"
                                 referrerPolicy="no-referrer"
                             >

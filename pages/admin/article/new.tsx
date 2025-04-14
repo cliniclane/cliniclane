@@ -24,7 +24,7 @@ const newArticle = {
   openGraphDescription: "",
   openGraphImage: "",
   canonical: "",
-  translatedFromId: null,
+  translations: [],
 };
 
 const NewArticle = () => {

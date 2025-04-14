@@ -1,6 +1,6 @@
 import Footer from "@/components/Footer";
 import Navbar from "@/components/Navbar";
-import Image from "next/image";
+// import Image from "next/image";
 import { BsArrowRight } from "react-icons/bs";
 import { useEffect, useState } from "react";
 import { serialize } from "next-mdx-remote/serialize";
@@ -29,7 +29,7 @@ const Article = ({ articleData, locale }: ArticleProps) => {
     const [headings, setHeadings] = useState<string[]>([]);
 
     const [showAssessMent, setShowAssessMent] = useState(false);
-    const [currImage, setCurrImage] = useState(articleData?.images ? articleData.images[0] : "");
+    // const [currImage, setCurrImage] = useState(articleData?.images ? articleData.images[0] : "");
 
     useEffect(() => {
         async function loadMDX() {
@@ -57,6 +57,12 @@ const Article = ({ articleData, locale }: ArticleProps) => {
                 title={articleData.title}
                 description={articleData.description}
                 canonical={articleData.canonical}
+                additionalMetaTags={[
+                    {
+                        name: "keywords",
+                        content: articleData.tags.join(", "),
+                    },
+                ]}
                 openGraph={{
                     url: articleData.canonical,
                     title: articleData.openGraphTitle || "",
@@ -97,9 +103,9 @@ const Article = ({ articleData, locale }: ArticleProps) => {
                     <h1 className="font-bold text-5xl md:w-[80%]">{articleData.title}</h1>
 
 
-                    <div className="grid md:grid-cols-2 gap-10">
+                    <div className="grid md:grid-cols-1 gap-10">
                         {/* Image */}
-                        <div className="mt-10">
+                        {/* <div className="mt-10">
                             <div className="grid grid-cols-3 grid-rows-2 gap-3">
                                 <div className="col-span-3">
                                     <Image
@@ -124,11 +130,10 @@ const Article = ({ articleData, locale }: ArticleProps) => {
                                     </div>
                                 ))
                                 }
-
                             </div>
-                        </div>
+                        </div> */}
                         {/* Tags */}
-                        <div className="flex h-fit flex-wrap mt-5 p-3">
+                        <div className="flex h-fit flex-wrap mt-5 mb-14">
                             {articleData.tags.filter(item => item !== "").map((tag, i) => (
                                 <span
                                     key={i}

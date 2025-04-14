@@ -93,6 +93,16 @@ export default function Articles() {
     const { productDetails } = article;
     const pd = productDetails;
 
+    const normalizedString = pd.substitutes.replace(/'/g, '"');
+    type Substitute = {
+      Name: string;
+      Manufacturer: string;
+      Price: string;
+      Savings: string;
+    };
+    // Parse the JSON string into objects
+    const substitutes: Substitute[] = JSON.parse(normalizedString);
+
     const parseStringArray = (input: string): string[] => {
       try {
         const fixed = input.replace(/'/g, '"');
@@ -124,7 +134,7 @@ export default function Articles() {
   
   ---
   
-  ## 📝 PRODICT INTRODUCTION
+  ## 📝 PRODUCT INTRODUCTION
   ${productDetails.productIntroduction}
 
   ---
@@ -180,8 +190,19 @@ export default function Articles() {
 
   ## ❓ FAQs
   ${pd.faqs}
-  
-   `.trim();
+
+  ---
+
+  ## Substitutes:
+
+  ${substitutes
+        .map((sub, index) => {
+          return `${index + 1}. [**${sub.Name}**](https://cliniclane.com) – ${sub.Price} (${sub.Savings.trim()})\n   _Manufacturer: ${sub.Manufacturer}_\n`;
+        })
+        .join("\n")
+      }
+
+  `.trim();
 
     return markdown;
   }
@@ -198,15 +219,17 @@ export default function Articles() {
       title: item.headline,
       slug: generateSlug(item.headline),
       tags: item.productDetails.commonSideEffects,
-      description: item.description || "",
+      description: item.description.replace("['", "").replace("']", "").replace("'", "") || "",
       author: "",
       language: item.inLanguage || "english",
-      headerImage: item.productDetails.imageUrls[0] || "",
+      // headerImage: item.productDetails.imageUrls[0] || "",
+      headerImage: "",
       publishDate: new Date().toISOString(),
-      images: item.productDetails.imageUrls,
+      images: [""],
       mdxString: generateMarkdown(item),
       canonical: item.canonicalUrl || "",
-      openGraphImage: item.productDetails.imageUrls[0] || "",
+      // openGraphImage: item.productDetails.imageUrls[0] || "",
+      openGraphImage: "",
       openGraphTitle: item.headline || "",
       openGraphDescription: item.description || "",
     }));
