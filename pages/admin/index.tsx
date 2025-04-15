@@ -6,6 +6,13 @@ import { signOut, useSession } from "next-auth/react";
 import ArticleTable from "@/components/Admin/ArticlesTable";
 import { useArticlesStore } from "@/lib/store/articles.store";
 
+
+type Substitute = {
+  Name: string;
+  URL: string;
+  Manufacturer: string;
+};
+
 type RawArticle = {
   headline: string;
   datePublished: string;
@@ -44,7 +51,7 @@ type RawArticle = {
     factBox: string;
     userFeedback: string;
     faqs: string;
-    substitutes: string; // Can be parsed into object[]
+    substitutes: Substitute[]; // Can be parsed into object[]
     prescriptionRequired: string;
     uses: string[]; // stringified arrays
     benefits: string; // stringified object
@@ -93,17 +100,10 @@ export default function Articles() {
     const { productDetails } = article;
     const pd = productDetails;
 
-    const normalizedString = pd.substitutes.replace(/'/g, '"');
-    type Substitute = {
-      Name: string;
-      url: string;
-      Manufacturer: string;
-      Price: string;
-      Savings: string;
-    };
+
 
     // Parse the JSON string into objects
-    const substitutes: Substitute[] = JSON.parse(normalizedString);
+    const substitutes: Substitute[] = pd.substitutes
 
     const parseStringArray = (input: string): string[] => {
       try {
@@ -198,7 +198,7 @@ export default function Articles() {
 
   ${substitutes
         .map((sub, index) => {
-          return `${index + 1}. [**${sub.Name}**](${process.env.NEXT_PUBLIC_NEXTAUTH_URL + "/" + sub.url}) – ${sub.Price} (${sub.Savings.trim()})\n   _Manufacturer: ${sub.Manufacturer}_\n`;
+          return `${index + 1}. [**${sub.Name}**](${sub.URL})  _Manufacturer: ${sub.Manufacturer}_\n`;
         })
         .join("\n")
       }
