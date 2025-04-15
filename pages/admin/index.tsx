@@ -96,10 +96,12 @@ export default function Articles() {
     const normalizedString = pd.substitutes.replace(/'/g, '"');
     type Substitute = {
       Name: string;
+      url: string;
       Manufacturer: string;
       Price: string;
       Savings: string;
     };
+
     // Parse the JSON string into objects
     const substitutes: Substitute[] = JSON.parse(normalizedString);
 
@@ -196,7 +198,7 @@ export default function Articles() {
 
   ${substitutes
         .map((sub, index) => {
-          return `${index + 1}. [**${sub.Name}**](https://cliniclane.com) – ${sub.Price} (${sub.Savings.trim()})\n   _Manufacturer: ${sub.Manufacturer}_\n`;
+          return `${index + 1}. [**${sub.Name}**](${process.env.NEXT_PUBLIC_NEXTAUTH_URL + "/" + sub.url}) – ${sub.Price} (${sub.Savings.trim()})\n   _Manufacturer: ${sub.Manufacturer}_\n`;
         })
         .join("\n")
       }
@@ -218,7 +220,7 @@ export default function Articles() {
       title: item.headline,
       slug: generateSlug(item.headline),
       tags: item.productDetails.commonSideEffects,
-      description: item.description.replace("['", "").replace("']", "").replace("'", "") || "",
+      description: item.description || "",
       author: "",
       language: item.inLanguage || "english",
       // headerImage: item.productDetails.imageUrls[0] || "",
@@ -226,11 +228,11 @@ export default function Articles() {
       publishDate: new Date().toISOString(),
       images: [""],
       mdxString: generateMarkdown(item),
-      canonical: process.env.NEXT_PUBLIC_NEXTAUTH_URL + "/" + item.canonicalUrl.split("/").at(-1) || "",
+      canonical: item.canonicalUrl || "",
       // openGraphImage: item.productDetails.imageUrls[0] || "",
       openGraphImage: "",
       openGraphTitle: item.headline || "",
-      openGraphDescription: item.description.replace("['", "").replace("']", "").replace("'", "") || "",
+      openGraphDescription: item.description || "",
     }));
 
     // Check for duplicates
