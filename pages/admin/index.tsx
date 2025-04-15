@@ -127,7 +127,6 @@ export default function Articles() {
 
     const markdown = `
   ## PRODUCT DETAILS
-  - **💰 Price:** ${pd.price}
   - **🧪 Salt Composition:** ${pd.saltComposition}
   - **📦 Storage:** ${pd.storage}
   - **📋 Prescription Required:** Yes
@@ -227,11 +226,11 @@ export default function Articles() {
       publishDate: new Date().toISOString(),
       images: [""],
       mdxString: generateMarkdown(item),
-      canonical: item.canonicalUrl || "",
+      canonical: process.env.NEXT_PUBLIC_NEXTAUTH_URL + "/" + item.canonicalUrl.split("/").at(-1) || "",
       // openGraphImage: item.productDetails.imageUrls[0] || "",
       openGraphImage: "",
       openGraphTitle: item.headline || "",
-      openGraphDescription: item.description || "",
+      openGraphDescription: item.description.replace("['", "").replace("']", "").replace("'", "") || "",
     }));
 
     // Check for duplicates
