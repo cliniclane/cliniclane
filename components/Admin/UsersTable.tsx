@@ -13,7 +13,7 @@ import {
     getSortedRowModel,
     useReactTable,
 } from "@tanstack/react-table"
-import { ArrowUpDown, ChevronDown, Loader2, MoreHorizontal } from "lucide-react"
+import { ArrowUpDown, ChevronDown, Loader2, Minus, MoreHorizontal, Plus } from "lucide-react"
 import {
     Dialog,
     DialogContent,
@@ -53,18 +53,21 @@ import {
     TableHeader,
     TableRow,
 } from "@/components/ui/table"
-import { Articles, Users } from "@prisma/client"
+import { Articles, Languages, Users } from "@prisma/client"
 import toast from "react-hot-toast"
+import { useSession } from "next-auth/react"
 
 
 const createColumns = ({
     setSelectedUserId,
     setIsSheetOpen,
-    setIsPasswordChangeModalOpen
+    setIsPasswordChangeModalOpen,
+    setIsAssignedBlogDialogOpen
 }: {
     setSelectedUserId: React.Dispatch<React.SetStateAction<string | null>>
     setIsSheetOpen: React.Dispatch<React.SetStateAction<boolean>>
-    setIsPasswordChangeModalOpen: React.Dispatch<React.SetStateAction<boolean>>
+    setIsPasswordChangeModalOpen: React.Dispatch<React.SetStateAction<boolean>>,
+    setIsAssignedBlogDialogOpen: React.Dispatch<React.SetStateAction<boolean>>
 }): ColumnDef<Users>[] => [
         {
             id: "select",
@@ -194,6 +197,14 @@ const createColumns = ({
                                 }}
                             >
                                 Assign Blogs
+                            </DropdownMenuItem>
+                            <DropdownMenuItem
+                                onClick={() => {
+                                    setSelectedUserId(user.id);
+                                    setIsAssignedBlogDialogOpen(true);
+                                }}
+                            >
+                                Assign Languages
                             </DropdownMenuItem>
                             <DropdownMenuItem
                                 onClick={() => {
@@ -361,6 +372,7 @@ export default function UsersTable({
     blogs: Articles[]
     setData: React.Dispatch<React.SetStateAction<Users[] | null>>
 }) {
+    console.log(data)
     const [sorting, setSorting] = React.useState<SortingState>([])
     const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>(
         []
@@ -375,15 +387,20 @@ export default function UsersTable({
     const [isCreateUserOpen, setIsCreateUserOpen] = React.useState(false);
     const [selectedBlogs, setSelectedBlogs] = React.useState<Set<string>>(new Set())
     const [isPasswordChangeModalOpen, setIsPasswordChangeModalOpen] = React.useState(false)
+    const [languages, setLanguages] = React.useState<Languages[] | null>(null);
+    const { data: session } = useSession()
+
 
     // ✅ State for Sheet
     const [selectedUserId, setSelectedUserId] = React.useState<string | null>(null)
     const [isSheetOpen, setIsSheetOpen] = React.useState(false)
+    const [isAssignedBlogDialogOpen, setIsAssignedBlogDialogOpen] = React.useState(false);
     const [newPassword, setNewPassword] = React.useState("")
+    const [userAssignedLanguages, setUserAssignedLanguages] = React.useState<string[]>([])
 
     // ✅ Pass state setters to createColumns
     const columns = React.useMemo(
-        () => createColumns({ setSelectedUserId, setIsSheetOpen, setIsPasswordChangeModalOpen }),
+        () => createColumns({ setSelectedUserId, setIsAssignedBlogDialogOpen, setIsSheetOpen, setIsPasswordChangeModalOpen }),
         [setSelectedUserId, setIsSheetOpen, setIsPasswordChangeModalOpen]
     )
 
@@ -514,6 +531,31 @@ export default function UsersTable({
         }
     }, [selectedUserId, data]);
 
+
+    const fetchLanguages = async () => {
+        const res = await fetch('/api/languages')
+        const data = await res.json()
+        setLanguages(data)
+    }
+
+
+    React.useEffect(() => {
+        if (!languages && session) {
+            fetchLanguages()
+        }
+    }, [languages, session]);
+
+    React.useEffect(() => {
+        if (selectedUserId) {
+            const user = data.find((user) => user.id === selectedUserId);
+            if (user) {
+                setUserAssignedLanguages(user.assignedLanguages)
+            }
+        } else {
+            setUserAssignedLanguages([])
+        }
+    }, [selectedUserId])
+
     const areSetsEqual = (setA: Set<string>, setB: Set<string>): boolean => {
         if (setA.size !== setB.size) return false;
         for (const item of setA) {
@@ -565,6 +607,39 @@ export default function UsersTable({
         }
     }
 
+    const handleSaveAssignedLanguages = async () => {
+        try {
+            const res = await fetch('/api/languages/user', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    userID: selectedUserId,
+                    languages: Array.from(userAssignedLanguages)
+                })
+            })
+            const data = await res.json()
+            console.log(data)
+            setIsAssignedBlogDialogOpen(false)
+            // Update data State
+            setData((prev) => {
+                if (!prev) return null; // Ensure a valid return value
+                return prev.map((user) => {
+                    if (user.id === selectedUserId) {
+                        return {
+                            ...user,
+                            assignedLanguages: Array.from(userAssignedLanguages)
+                        };
+                    }
+                    return user;
+                });
+            });
+        } catch {
+
+        }
+    }
+
     return (
         <div className="w-full">
             <Sheet open={isSheetOpen} onOpenChange={
@@ -612,6 +687,72 @@ export default function UsersTable({
 
                 </SheetContent>
             </Sheet>
+            <Dialog open={isAssignedBlogDialogOpen} onOpenChange={setIsAssignedBlogDialogOpen}>
+                <DialogContent>
+                    <DialogHeader>
+                        <DialogTitle>Assign Languages</DialogTitle>
+                        <DialogDescription>
+                            {
+                                userAssignedLanguages?.map((language) => (
+
+                                    <div key={language} className="flex flex-row gap-2">
+                                        <span className="text-sm mt-2 bg-blue-400 text-black rounded-lg px-3 py-1">{language}</span>
+                                    </div>
+                                ))
+                            }
+
+                            <p className="text-gray-500 text-sm my-5">Select one or more languages</p>
+                            <div className="flex justify-between">
+
+                                <DropdownMenu >
+                                    <DropdownMenuTrigger>
+                                        <Button variant="outline" className="">Select Languages</Button>
+                                    </DropdownMenuTrigger>
+                                    <DropdownMenuContent className="mt-4">
+                                        {
+                                            languages?.map((language) => (
+                                                <DropdownMenuCheckboxItem
+                                                    className="justify-between"
+                                                    key={language.id}
+                                                    checked={userAssignedLanguages?.includes(language.name)}
+                                                    onCheckedChange={(checked) => {
+                                                        if (checked) {
+                                                            if (userAssignedLanguages?.length > 0) {
+                                                                setUserAssignedLanguages((prev) => [...prev, language.name])
+                                                            }
+                                                            else {
+                                                                setUserAssignedLanguages([language.name])
+                                                            }
+                                                        } else {
+                                                            setUserAssignedLanguages((prev) => prev.filter((l) => l !== language.name))
+                                                        }
+                                                    }}
+                                                >
+                                                    {language.name} <Button
+
+                                                        variant="outline" size="icon">
+                                                        {
+                                                            userAssignedLanguages?.includes(language.name) ? (
+                                                                <Minus />
+                                                            ) : (
+                                                                <Plus className="" />
+                                                            )
+                                                        }
+                                                    </Button>
+                                                </DropdownMenuCheckboxItem>
+                                            ))
+                                        }
+                                    </DropdownMenuContent>
+                                </DropdownMenu>
+
+                                <Button className="mt-4" onClick={handleSaveAssignedLanguages}>Save</Button>
+                            </div>
+
+                        </DialogDescription>
+                    </DialogHeader>
+                </DialogContent>
+            </Dialog>
+
             <div className="grid lg:grid-cols-6 gap-2 items-center py-4">
                 <Input
                     placeholder="Filter emails..."

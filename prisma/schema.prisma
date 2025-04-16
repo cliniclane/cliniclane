@@ -8,14 +8,15 @@ datasource db {
 }
 
 model Users {
-  id            String   @id @map("_id")
-  email         String   @unique
-  password      String
-  role          String   @default("admin")
-  assignedBlogs String[] @default([])
-  status        String   @default("active")
-  createdAt     DateTime @default(now())
-  updatedAt     DateTime @updatedAt
+  id                String   @id @map("_id")
+  email             String   @unique
+  password          String
+  role              String   @default("admin")
+  assignedBlogs     String[] @default([])
+  assignedLanguages String[] @default([])
+  status            String   @default("active")
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
 }
 
 type Translations {

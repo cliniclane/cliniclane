@@ -47,6 +47,7 @@ import {
 import { Articles } from "@prisma/client"
 import toast from "react-hot-toast"
 import Link from "next/link"
+import { useSession } from "next-auth/react";
 type RawArticle = {
     headline: string;
     datePublished: string;
@@ -221,6 +222,7 @@ export default function ArticleTable({
     const [isDeleteModalOpen, setIsDeleteModalOpen] = React.useState(false);
     const [isImportModalOpen, setIsImportModalOpen] = React.useState(false);
     const [selectedRow, setSelectedRow] = React.useState<Articles | null>(null);
+    const { data: session } = useSession()
 
     // Sabe extracted data to database
     const handleSaveExtractedData = async () => {
@@ -230,7 +232,7 @@ export default function ArticleTable({
             const res = await fetch("/api/article/many", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ articles: selectedArticles })
+                body: JSON.stringify({ articles: selectedArticles, email: session?.user?.email })
             });
 
             if (res.status === 200) {

@@ -221,7 +221,7 @@ export default function Articles() {
       slug: generateSlug(item.headline),
       tags: item.productDetails.commonSideEffects,
       description: item.description || "",
-      author: "",
+      author: session?.user.email,
       language: item.inLanguage || "english",
       // headerImage: item.productDetails.imageUrls[0] || "",
       headerImage: "",

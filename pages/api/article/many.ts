@@ -8,10 +8,30 @@ export default async function handler(
   res: NextApiResponse
 ) {
   if (req.method === "POST") {
-    const { articles } = req.body;
+    const { articles, email } = req.body;
+    const articlesIDsArray =  articles.map((a: Articles) => a.id);
     if (articles) {
       try {
         // get user information
+        const user = await prisma.users.findUnique({
+          where: { email: email as string },
+        });
+
+        if (!user) {
+          return res.status(404).json({ error: "User not found" });
+        }
+
+        if (user.role !== "super_admin") {
+          await prisma.users.update({
+            where: { id: user.id },
+            data: {
+              assignedBlogs: {
+                push: articlesIDsArray,
+              },
+            },
+          });
+        }
+
         await prisma.articles.createMany({
           data: articles,
         });
