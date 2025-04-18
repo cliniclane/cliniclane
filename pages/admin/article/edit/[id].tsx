@@ -242,9 +242,6 @@ const EditArticle = () => {
     }
   }, [images])
 
-  console.log(article)
-  console.log(translatedContent)
-
   return (
     <div className="flex">
       <Sidebar selected="articles" />
