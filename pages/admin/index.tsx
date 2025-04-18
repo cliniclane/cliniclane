@@ -15,6 +15,8 @@ type Substitute = {
 
 type RawArticle = {
   headline: string;
+  slug: string;
+  language: string;
   datePublished: string;
   datePublishedRaw: string;
   dateModified: string;
@@ -86,16 +88,6 @@ export default function Articles() {
     }
   }, [status, session, articles]);
 
-
-  const generateSlug = (title: string): string => {
-    return title
-      .toLowerCase()
-      .trim()
-      .replace(/[^\w\s-]/g, '')       // Remove special characters except space and hyphen
-      .replace(/\s+/g, '-')           // Replace spaces with hyphens
-      .replace(/-+/g, '-');           // Replace multiple hyphens with a single one
-  };
-
   function generateMarkdown(article: RawArticle): string {
     const { productDetails } = article;
     const pd = productDetails;
@@ -145,26 +137,26 @@ export default function Articles() {
 
   <br />
   
-  ## BENEFITS OF ${pd.productName.toUpperCase()}
+  ## BENEFITS 
   ${Object.entries(benefits)
         .map(([key, val]) => `### ✅ ${key}\n${val}`)
         .join('\n\n')}
 
   ---
   
-  ## ⚠️ SIDE EFFECTS OF ${pd.productName.toUpperCase()}
+  ## ⚠️ SIDE EFFECTS 
   ${pd.sideEffects}
 
   ${pd.commonSideEffects.filter(Boolean).map(effect => `- ${effect}`).join('\n')}
   
   ---
   
-  ## 📥 HOW TO USE ${pd.productName.toUpperCase()}
+  ## 📥 HOW TO USE
   ${pd.howToUse}
 
   ---
 
-  ## ⚙️ HOW ${pd.productName.toUpperCase()} WORKS
+  ## ⚙️ HOW IT WORKS
   ${pd.howItWorks}
 
   ---
@@ -179,7 +171,7 @@ export default function Articles() {
 
   ---
   
-  ## ⏱️ WHAT IF YOU FORGET TO TAKE ${pd.productName.toUpperCase()}
+  ## ⏱️ WHAT IF YOU FORGET TO TAKE ${pd.productName.toUpperCase()}\n
   ${pd.missedDosage}
 
   ---
@@ -218,11 +210,11 @@ export default function Articles() {
     const formatted: IArticles[] = rawData.map((item: RawArticle) => ({
       id: Math.random().toString(36).substring(2, 15),
       title: item.headline,
-      slug: generateSlug(item.headline),
+      slug: item.slug,
       tags: item.productDetails.commonSideEffects,
       description: item.description || "",
       author: session?.user.email,
-      language: item.inLanguage || "english",
+      language: item.language || "english",
       // headerImage: item.productDetails.imageUrls[0] || "",
       headerImage: "",
       publishDate: new Date().toISOString(),
