@@ -27,13 +27,28 @@ const Article = ({ articleData, locale }: ArticleProps) => {
         Record<string, unknown>
     > | null>(null);
     const [headings, setHeadings] = useState<string[]>([]);
+    const [translatedContent, setTranslatedContent] = useState<Translations | undefined>(undefined);
 
     const [showAssessMent, setShowAssessMent] = useState(false);
     // const [currImage, setCurrImage] = useState(articleData?.images ? articleData.images[0] : "");
 
     useEffect(() => {
+        if (articleData.translations && locale !== "english" && articleData.translations.length > 0) {
+            const translations = articleData.translations.find(t => t.language === locale);
+            if (translations) {
+                setTranslatedContent(translations);
+            }
+        }
+        else {
+            setTranslatedContent(undefined)
+        }
+    }, [locale])
+
+    useEffect(() => {
         async function loadMDX() {
-            const mdxString = articleData.mdxString;
+            const mdxString = locale === "english"
+                ? articleData.mdxString
+                : articleData.translations?.find((t) => t.language === locale)?.mdxString || "";
             const mdxSource = await serialize(mdxString);
             setMdxContent(mdxSource);
 
@@ -54,8 +69,8 @@ const Article = ({ articleData, locale }: ArticleProps) => {
        * SEO
        */}
             <NextSeo
-                title={articleData.title}
-                description={articleData.description}
+                title={translatedContent ? translatedContent.title : articleData.title}
+                description={translatedContent ? translatedContent.description : articleData.description}
                 canonical={articleData.canonical}
                 additionalMetaTags={[
                     {
@@ -65,8 +80,8 @@ const Article = ({ articleData, locale }: ArticleProps) => {
                 ]}
                 openGraph={{
                     url: articleData.canonical,
-                    title: articleData.openGraphTitle || "",
-                    description: articleData.openGraphDescription || "",
+                    title: translatedContent ? translatedContent.openGraphTitle ?? "" : articleData.openGraphTitle ?? "",
+                    description: translatedContent ? translatedContent.openGraphDescription ?? "" : articleData.openGraphDescription ?? "",
                     images: [
                         {
                             url: articleData.openGraphImage || "",
@@ -100,8 +115,7 @@ const Article = ({ articleData, locale }: ArticleProps) => {
                 {/* Header */}
                 <div className="flex flex-col">
                     {/* Title */}
-                    <h1 className="font-bold text-5xl md:w-[80%]">{articleData.title}</h1>
-
+                    <h1 className="font-bold text-5xl md:w-[80%]">{translatedContent ? translatedContent.title : articleData.title}</h1>
 
                     <div className="grid md:grid-cols-1 gap-10">
                         {/* Image */}
@@ -277,6 +291,7 @@ export const getStaticProps: GetStaticProps = async ({ params, locale }) => {
         : blog.translations.find((t: Translations) => t.language === locale)?.mdxString;
 
     if (!mdxContent?.trim()) return { notFound: true };
+
 
     return {
         props: {
