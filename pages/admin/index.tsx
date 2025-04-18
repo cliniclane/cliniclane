@@ -55,7 +55,7 @@ type RawArticle = {
     faqs: string;
     substitutes: Substitute[]; // Can be parsed into object[]
     prescriptionRequired: string;
-    uses: string[]; // stringified arrays
+    uses: string; // stringified arrays
     benefits: string; // stringified object
   };
   metadata: {
@@ -93,8 +93,20 @@ export default function Articles() {
   // Fetch users from API
   const fetchLanguages = async () => {
     const res = await fetch('/api/languages');
-    const data = await res.json()
-    setLanguages(data)
+    const allLanguages = await res.json()
+    if (session && session.user.role === "super_admin") {
+      setLanguages(allLanguages)
+    }
+    else {
+      const res = await fetch('/api/languages/user?email=' + session?.user.email, {
+        method: 'GET',
+      })
+      let data = await res.json()
+      data = data.map((l: string) => l.toLowerCase())
+      const sortedLanguages = allLanguages.filter((l: Languages) => data.includes(l.code))
+      // select only languages that the user has access to
+      setLanguages(sortedLanguages)
+    }
   }
 
   useEffect(() => {
@@ -107,20 +119,29 @@ export default function Articles() {
     const { productDetails } = article;
     const pd = productDetails;
 
-
-
     // Parse the JSON string into objects
     const substitutes: Substitute[] = pd.substitutes
 
-    const parseStringArray = (input: string): string[] => {
+    function generateMarkdownFromRawObjectString(input: string): string {
+      // Clean and format the string into valid JSON
+      const cleaned = input
+        .replace(/^{|}$/g, '') // Remove starting and ending braces
+        .replace(/'([^']+)':/g, '"$1":') // Convert keys to valid JSON keys
+        .replace(/: '([^']+)'/g, ': "$1"') // Convert values to valid JSON strings
+        .replace(/\\n/g, '') // Optional: remove \n if present inside strings
+
       try {
-        const fixed = input.replace(/'/g, '"');
-        const parsed = JSON.parse(fixed);
-        return Array.isArray(parsed) ? parsed : [];
-      } catch {
-        return [];
+        const validJson = `{${cleaned}}`;
+        const data = JSON.parse(validJson) as Record<string, string>;
+
+        return Object.entries(data)
+          .map(([key, value]) => `- **${key}**: ${value}`)
+          .join('\n\n');
+      } catch (error) {
+        console.error('Invalid object-like string format:', error);
+        return '';
       }
-    };
+    }
 
     const parseObject = (input: string): Record<string, { Status: string; Details: string }> => {
       try {
@@ -130,9 +151,27 @@ export default function Articles() {
       }
     };
 
-    const safetyAdviceObj = parseObject(pd.safetyAdvice);
     const benefits = parseObject(pd.benefits);
-    const uses = parseStringArray(pd.uses[0] || "[]");
+    const uses = pd.uses.split(', ');
+
+    function formatFAQMarkdown(faqRaw: string): string {
+      const lines = faqRaw.trim().split('\n');
+      let formattedMarkdown = '';
+
+      for (let i = 0; i < lines.length; i++) {
+        const line = lines[i].trim();
+
+        if (line.startsWith('Q:')) {
+          const question = line.replace(/^Q:\s*/, '');
+          formattedMarkdown += `**Q: ${question}**`;
+        } else if (line.startsWith('A:')) {
+          const answer = line.replace(/^A:\s*/, '');
+          formattedMarkdown += `\nA: ${answer}\n\n`;
+        }
+      }
+
+      return formattedMarkdown.trim();
+    }
 
     const markdown = `
   ## PRODUCT DETAILS
@@ -162,7 +201,7 @@ export default function Articles() {
   ## ⚠️ SIDE EFFECTS 
   ${pd.sideEffects}
 
-  ${pd.commonSideEffects.filter(Boolean).map(effect => `- ${effect}`).join('\n')}
+  ${pd.commonSideEffects.map((item, i) => `${i + 1}. ${item}`).join('\n')}
   
   ---
   
@@ -179,14 +218,11 @@ export default function Articles() {
   ## 🛡️ SAFETY ADVICE
 
   <br />
-
-  ${Object.entries(safetyAdviceObj)
-        .map(([key, val]) => `### ⚠️ ${key}\n- **Status:** ${val.Status}\n- **Details:** ${val.Details}`)
-        .join('\n\n')}
+  ${generateMarkdownFromRawObjectString(pd.safetyAdvice)}
 
   ---
   
-  ## ⏱️ WHAT IF YOU FORGET TO TAKE ${pd.productName.toUpperCase()}\n
+  ## ⏱️ WHAT IF YOU FORGET TO TAKE\n
   ${pd.missedDosage}
 
   ---
@@ -197,7 +233,7 @@ export default function Articles() {
   ---
 
   ## ❓ FAQs
-  ${pd.faqs}
+  ${formatFAQMarkdown(pd.faqs)}
 
   ---
 

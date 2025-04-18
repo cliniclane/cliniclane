@@ -28,5 +28,23 @@ export default async function handler(
       console.log(error);
       res.status(500).json({ error: "Failed to create language" });
     }
+  } else if (req.method === "GET") {
+    const { email } = req.query;
+    if (!email) {
+      res.status(400).json({ error: "email is required" });
+    }
+
+    try {
+      const l = await prisma.users.findUnique({
+        where: { email: email as string },
+        select: {
+          assignedLanguages: true,
+        },
+      });
+      res.status(200).json(l?.assignedLanguages);
+    } catch (error: unknown) {
+      console.log(error);
+      res.status(500).json({ error: "Failed to create language" });
+    }
   }
 }

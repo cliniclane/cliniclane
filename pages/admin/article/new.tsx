@@ -209,10 +209,20 @@ const NewArticle = () => {
 
   // Fetch users from API
   const fetchLanguages = async () => {
-    const res = await fetch('/api/languages')
-    const data = await res.json()
-    setLanguages(data)
-    setCurrLanguage(data[0])
+    const res = await fetch('/api/languages');
+    const allLanguages = await res.json()
+    if (session && session.user.role === "super_admin") {
+      setLanguages(allLanguages)
+    }
+    else {
+      const res = await fetch('/api/languages/user?email=' + session?.user.email, {
+        method: 'GET',
+      })
+      let data = await res.json()
+      data = data.map((l: string) => l.toLowerCase())
+      // select only languages that the user has access to
+      setLanguages(allLanguages.filter((l: Languages) => data.includes(l.code)))
+    }
   }
 
   useEffect(() => {
