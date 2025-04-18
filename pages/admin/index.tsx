@@ -1,5 +1,5 @@
 import Sidebar from "@/components/Admin/Sidebar";
-import { Articles as IArticles } from "@prisma/client";
+import { Articles as IArticles, Languages } from "@prisma/client";
 import { useEffect, useState } from "react";
 import toast from "react-hot-toast";
 import { signOut, useSession } from "next-auth/react";
@@ -71,6 +71,8 @@ export default function Articles() {
   const { data: session, status } = useSession()
   const [extractedData, setExtractedData] = useState<IArticles[] | null>(null);
   const [selectedArticles, setSelectedArticles] = useState<IArticles[]>([]);
+  const [languages, setLanguages] = useState<Languages[] | null>(null);
+  const [selectedImportLanguage, setSelectedImportLanguage] = useState<Languages | null>(null);
 
   const handleCheckboxChange = (article: IArticles) => {
     setSelectedArticles(
@@ -87,6 +89,19 @@ export default function Articles() {
       if (!session?.user.email || !session.user.role || !session.user.image) signOut()
     }
   }, [status, session, articles]);
+
+  // Fetch users from API
+  const fetchLanguages = async () => {
+    const res = await fetch('/api/languages');
+    const data = await res.json()
+    setLanguages(data)
+  }
+
+  useEffect(() => {
+    if (!languages && session) {
+      fetchLanguages()
+    }
+  }, [languages, session]);
 
   function generateMarkdown(article: RawArticle): string {
     const { productDetails } = article;
@@ -215,13 +230,11 @@ export default function Articles() {
       description: item.description || "",
       author: session?.user.email,
       language: item.language || "english",
-      // headerImage: item.productDetails.imageUrls[0] || "",
       headerImage: "",
       publishDate: new Date().toISOString(),
       images: [""],
       mdxString: generateMarkdown(item),
       canonical: item.canonicalUrl || "",
-      // openGraphImage: item.productDetails.imageUrls[0] || "",
       openGraphImage: "",
       openGraphTitle: item.headline || "",
       openGraphDescription: item.description || "",
@@ -244,24 +257,10 @@ export default function Articles() {
       return;
     }
 
-    // Map through the languages and set the name value 
-    const languages = [
-      { code: "en", name: "english" },
-      { code: "es", name: "spanish" },
-      { code: "fr", name: "french" },
-      { code: "de", name: "german" },
-      { code: "it", name: "italian" },
-      { code: "pt", name: "portuguese" },
-    ];
-
-    formatted.forEach((item) => {
-      const lang = languages.find((lang) => lang.code === item.language);
-      if (lang) {
-        item.language = lang.name;
-      } else {
-        item.language = "english"; // Default to English if not found
-      }
-    });
+    // Set selected language
+    setSelectedImportLanguage(
+      languages?.find((language) => language.code === formatted[0].language) || null
+    )
 
     setExtractedData(formatted);
     setSelectedArticles(formatted)
@@ -299,6 +298,9 @@ export default function Articles() {
 
         {/* Responsive Table */}
         {articles && <ArticleTable
+          selectedImportLanguage={selectedImportLanguage}
+          setSelectedImportLanguage={setSelectedImportLanguage}
+          languages={languages}
           selectedArticles={selectedArticles}
           handleCheckboxChange={handleCheckboxChange}
           setExtractedData={setExtractedData} extractedData={extractedData} handleOnFileChange={handleFileChange} data={articles} setData={setArticles} />}

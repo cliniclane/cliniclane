@@ -23,7 +23,7 @@ import {
     AlertDialogHeader,
     AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
-import { ArrowUpDown, ChevronDown, Eye, Import, Loader2, MoreHorizontal, Pencil } from "lucide-react"
+import { ArrowUpDown, ChevronDown, Eye, Globe, Import, Loader2, MoreHorizontal, Pencil } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Checkbox } from "@/components/ui/checkbox"
 import {
@@ -44,7 +44,7 @@ import {
     TableHeader,
     TableRow,
 } from "@/components/ui/table"
-import { Articles } from "@prisma/client"
+import { Articles, Languages } from "@prisma/client"
 import toast from "react-hot-toast"
 import Link from "next/link"
 import { useSession } from "next-auth/react";
@@ -137,10 +137,11 @@ const createColumns = ({
             cell: ({ row }) => <div className="">{new Date(row.getValue("publishDate")).toDateString()}</div>,
         },
         {
-            accessorKey: "language",
-            header: () => <div className="text-right">Language</div>,
+            accessorKey: "languages",
+            header: () => <div className="text-right">Languages</div>,
             cell: ({ row }) => {
-                return <div className="text-right capitalize font-medium">{row.getValue("language")}</div>
+                const r = row.original;
+                return <div className="text-right capitalize font-medium">{`${r.mdxString === "" ? "" : r.language}${r.translations?.length > 0 ? ", " : ""}${r.translations.map((l) => l.language).join(", ")}`}</div>
             },
         },
         {
@@ -202,6 +203,9 @@ export default function ArticleTable({
     setExtractedData,
     setData,
     handleOnFileChange,
+    languages,
+    selectedImportLanguage,
+    setSelectedImportLanguage
 }: {
     data: Articles[]
     selectedArticles: Articles[]
@@ -210,6 +214,10 @@ export default function ArticleTable({
     setData: React.Dispatch<React.SetStateAction<Articles[] | null | undefined>>
     handleOnFileChange: (e: React.ChangeEvent<HTMLInputElement>) => void
     handleCheckboxChange: (article: Articles) => void
+    selectedImportLanguage?: Languages | null
+    languages?: Languages[] | null
+    setSelectedImportLanguage: React.Dispatch<React.SetStateAction<Languages | null>>
+
 }) {
     const [sorting, setSorting] = React.useState<SortingState>([])
     const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>(
@@ -224,27 +232,48 @@ export default function ArticleTable({
     const [selectedRow, setSelectedRow] = React.useState<Articles | null>(null);
     const { data: session } = useSession()
 
+
+
     // Sabe extracted data to database
     const handleSaveExtractedData = async () => {
         if (!selectedArticles) return;
         setIsLoading(true);
+        let articles;
+        if (selectedImportLanguage) {
+            // change language for all the articles
+            articles = selectedArticles.map((article) => ({
+                ...article,
+                language: selectedImportLanguage.code
+            })
+            )
+        } else {
+            // change language for all the articles
+            articles = selectedArticles
+        }
         try {
             const res = await fetch("/api/article/many", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ articles: selectedArticles, email: session?.user?.email })
+                body: JSON.stringify({ articles: articles, email: session?.user?.email })
             });
 
             if (res.status === 200) {
                 const newData = await res.json();
-                console.log(newData)
-                const newArticles = [...data, ...newData.data];
-                // sort the data date wise
-                newArticles.sort((a, b) => {
-                    return new Date(b.publishDate).getTime() - new Date(a.publishDate).getTime();
+                const updatedData = [...data]; // clone current data
+
+                newData.data.forEach((newArticle: Articles) => {
+                    const existingIndex = updatedData.findIndex(article => article.id === newArticle.id);
+
+                    if (existingIndex !== -1) {
+                        // Update existing article
+                        updatedData[existingIndex] = newArticle;
+                    } else {
+                        // Add new article to the first position
+                        updatedData.unshift(newArticle);
+                    }
                 });
-                // set the data to the table
-                setData(newArticles);
+
+                setData(updatedData);
                 toast.success("Articles imported successfully");
             }
             else {
@@ -453,6 +482,7 @@ export default function ArticleTable({
                                     Only JSON files with a `.json` extension are
                                     accepted.
                                 </span>
+
                                 <Input
                                     placeholder="Import JSON file"
                                     type="file"
@@ -460,6 +490,7 @@ export default function ArticleTable({
                                     onChange={handleOnFileChange}
                                     className="my-6 h-12"
                                 />
+
                                 {extractedData && (
                                     <ul className="space-y-1 mb-5">
                                         {extractedData.map((article, index) => (
@@ -476,9 +507,30 @@ export default function ArticleTable({
                                     </ul>
                                 )}
 
-                                <span className="text-gray-500 mt-5">
-                                    Selected: {selectedArticles.length} of {extractedData?.length}
-                                </span>
+                                <div className="w-full flex justify-between my-5">
+                                    <span className="text-gray-500 mt-5">
+                                        Selected: {selectedArticles.length} of {extractedData?.length}
+                                    </span>
+                                    <DropdownMenu>
+                                        <DropdownMenuTrigger asChild>
+                                            <Button variant="outline" className="flex items-center space-x-2">
+                                                <Globe className="w-4 h-4 mr-2" />
+                                                <span className="capitalize">{selectedImportLanguage?.name || "English"}</span>
+                                            </Button>
+                                        </DropdownMenuTrigger>
+                                        <DropdownMenuContent align="end">
+                                            {languages?.map((loc) => (
+                                                <DropdownMenuItem
+                                                    key={loc.id}
+                                                    onClick={() => setSelectedImportLanguage(loc)}
+                                                    className="capitalize"
+                                                >
+                                                    {loc.name}
+                                                </DropdownMenuItem>
+                                            ))}
+                                        </DropdownMenuContent>
+                                    </DropdownMenu>
+                                </div>
                             </AlertDialogDescription>
                         </AlertDialogHeader>
                         <AlertDialogFooter>

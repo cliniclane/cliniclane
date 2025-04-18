@@ -51,10 +51,16 @@ const BasicEditForm: FC<IProps> = ({
 
   // Fetch users from API
   const fetchLanguages = async () => {
-    const res = await fetch('/api/languages')
+    const res = await fetch('/api/languages');
     const data = await res.json()
     setLanguages(data)
   }
+
+  useEffect(() => {
+    if (!languages && session) {
+      fetchLanguages()
+    }
+  }, [languages, session]);
 
 
   // Fetch user images 
@@ -70,11 +76,7 @@ const BasicEditForm: FC<IProps> = ({
     }
   }, [userImages, session]);
 
-  useEffect(() => {
-    if (!languages && session) {
-      fetchLanguages()
-    }
-  }, [languages, session]);
+
 
 
   return (
