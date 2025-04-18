@@ -1,6 +1,6 @@
 import React, { FC, useEffect, useState } from "react";
 import MdxEditor from "./MDXEditor";
-import { Articles, Images, Languages } from "@prisma/client";
+import { Articles, Images, Languages, Translations } from "@prisma/client";
 import { getCookie } from "cookies-next";
 import { useSession } from "next-auth/react";
 import { FileUploaderRegular } from "@uploadcare/react-uploader";
@@ -18,26 +18,30 @@ import { Input } from "../ui/input";
 
 interface IProps {
   article: Articles;
-  mdxString: string | undefined;
   images: string[];
   setImages: React.Dispatch<React.SetStateAction<string[]>>;
   handleChange: (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>
   ) => void;
-  setMdxString: React.Dispatch<React.SetStateAction<string | undefined>>;
+  handleTranslatedContentChange: (
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>
+  ) => void;
+  handleMdxStringChange: (value: string | undefined) => void
   handleSave: () => void;
   loading: boolean;
+  translatedContent: Translations | undefined;
 }
 
 const BasicEditForm: FC<IProps> = ({
   article,
-  mdxString,
   images,
   setImages,
   handleChange,
-  setMdxString,
+  handleTranslatedContentChange,
   handleSave,
   loading,
+  translatedContent,
+  handleMdxStringChange
 }) => {
   const [theme, setTheme] = useState("github");
   const [languages, setLanguages] = useState<Languages[] | null>(null);
@@ -76,9 +80,6 @@ const BasicEditForm: FC<IProps> = ({
     }
   }, [userImages, session]);
 
-
-
-
   return (
     <div className="w-full pt-10">
       <div className="mb-6">
@@ -93,9 +94,9 @@ const BasicEditForm: FC<IProps> = ({
           id="title"
           name="title"
           className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5"
-          placeholder={article.title || ""}
-          value={article?.title}
-          onChange={handleChange}
+          placeholder={translatedContent ? translatedContent.title : article.title || ""}
+          value={translatedContent ? translatedContent.title : article?.title}
+          onChange={translatedContent ? handleTranslatedContentChange : handleChange}
         />
       </div>
       <div className="mb-6">
@@ -117,7 +118,7 @@ const BasicEditForm: FC<IProps> = ({
       </div>
 
       {/* Languge */}
-      <div className="mb-6">
+      {/* <div className="mb-6">
         <label
           htmlFor="language"
           className="block mb-2 text-lg font-semibold text-gray-900 "
@@ -139,7 +140,7 @@ const BasicEditForm: FC<IProps> = ({
           ))}
         </select>
 
-      </div>
+      </div> */}
 
       <div className="mb-6">
         <label
@@ -153,8 +154,8 @@ const BasicEditForm: FC<IProps> = ({
           id="description"
           name="description"
           rows={4}
-          value={article?.description || ""}
-          onChange={handleChange}
+          value={translatedContent ? translatedContent.description : article?.description || ""}
+          onChange={translatedContent ? handleTranslatedContentChange : handleChange}
           className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 "
         />
       </div>
@@ -295,9 +296,9 @@ const BasicEditForm: FC<IProps> = ({
         </label>
         <MdxEditor
           theme={theme}
+          value={translatedContent ? translatedContent.mdxString : article?.mdxString || ""}
+          setValue={handleMdxStringChange}
           setTheme={setTheme}
-          value={mdxString}
-          setValue={setMdxString}
         />
       </div>
 

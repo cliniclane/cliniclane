@@ -57,7 +57,7 @@ const Article = ({ articleData, locale }: ArticleProps) => {
             setHeadings(extractedHeadings);
         }
         loadMDX();
-    }, []);
+    }, [locale]);
 
     useEffect(() => {
         setCookie('preferredLanguage', locale)

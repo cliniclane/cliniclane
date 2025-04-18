@@ -1,4 +1,4 @@
-import { Articles } from "@prisma/client";
+import { Articles, Translations } from "@prisma/client";
 import React, { FC } from "react";
 import { AiOutlineClose } from "react-icons/ai";
 
@@ -7,6 +7,9 @@ interface IProps {
   handleChange: (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
   ) => void;
+  handleTranslatedContentChange: (
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>
+  ) => void;
   tags: string[];
   inputValue: string;
   setInputValue: (inputValue: string) => void;
@@ -14,6 +17,7 @@ interface IProps {
   removeTag: (tag: string) => void;
   handleSave: () => void;
   loading: boolean;
+  translatedContent: Translations | undefined;
 }
 
 const SEOEditForm: FC<IProps> = ({
@@ -24,8 +28,10 @@ const SEOEditForm: FC<IProps> = ({
   removeTag,
   article,
   handleChange,
+  handleTranslatedContentChange,
   handleSave,
   loading,
+  translatedContent
 }) => {
   // Function to render input fields dynamically
   const renderInputField = (id: string, label: string, value?: string) => (
@@ -43,7 +49,7 @@ const SEOEditForm: FC<IProps> = ({
         className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 "
         placeholder={`Enter ${label}`}
         value={value ?? ""}
-        onChange={handleChange}
+        onChange={translatedContent ? handleTranslatedContentChange : handleChange}
       />
     </div>
   );
@@ -90,7 +96,7 @@ const SEOEditForm: FC<IProps> = ({
       {renderInputField(
         "openGraphTitle",
         "Open Graph Title",
-        article?.openGraphTitle || ""
+        translatedContent ? translatedContent?.openGraphTitle as string : article?.openGraphTitle as string
       )}
       <div className="mb-6">
         <label
@@ -103,8 +109,8 @@ const SEOEditForm: FC<IProps> = ({
           cols={10}
           id="openGraphDescription"
           name="openGraphDescription"
-          onChange={handleChange}
-          value={article?.openGraphDescription || ""}
+          onChange={translatedContent ? handleTranslatedContentChange : handleChange}
+          value={translatedContent ? translatedContent?.openGraphDescription as string : article?.openGraphDescription as string}
           className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
         />
       </div>

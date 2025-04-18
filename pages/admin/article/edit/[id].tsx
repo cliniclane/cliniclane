@@ -2,7 +2,7 @@ import BasicEditForm from "@/components/Admin/BasicEditForm";
 import SEOEditForm from "@/components/Admin/SEOEditForm";
 import Sidebar from "@/components/Admin/Sidebar";
 import { useArticlesStore } from "@/lib/store/articles.store";
-import { Articles, Languages } from "@prisma/client";
+import { Articles, Languages, Translations } from "@prisma/client";
 import { useRouter } from "next/router";
 import React, { ChangeEvent, useEffect, useState } from "react";
 import toast, { Toaster } from "react-hot-toast";
@@ -32,13 +32,13 @@ const EditArticle = () => {
 
   const [article, setArticle] = useState<Articles | null>(null);
   const { setArticles } = useArticlesStore()
-  const [mdxString, setMdxString] = useState<string | undefined>(undefined);
   const [tags, setTags] = useState<string[]>([]);
   const [inputValue, setInputValue] = useState("");
   const [images, setImages] = useState(["", "", ""])
   const [currLanguage, setCurrLanguage] = useState<Languages | null>(null);
   const [languages, setLanguages] = useState<Languages[] | null>(null);
   const { data: session } = useSession()
+  const [translatedContent, setTranslatedContent] = useState<Translations | undefined>(undefined);
 
 
 
@@ -56,6 +56,11 @@ const EditArticle = () => {
     setTags(tags.filter((tag) => tag !== tagToRemove));
   };
 
+  /**
+   * Handle text, select, and textarea inputs.
+   * @param {ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>} e
+   * The event object.
+   */
   const handleChange: (
     e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>
   ) => void = (e) => {
@@ -67,14 +72,84 @@ const EditArticle = () => {
     });
   };
 
+  const handleMdxStringChange = (value: string | undefined) => {
+    if (translatedContent) {
+      setTranslatedContent((prev) => {
+        if (!prev) return prev; // Ensure the previous state exists
+        return { ...prev, mdxString: value || "" }; // Ensure mdxString is always a string
+      });
+      setArticle((prev) => {
+        if (!prev) return prev; // Ensure the previous state exists
+        return { ...prev, translations: prev.translations.map((t) => t.language === currLanguage?.code ? { ...t, mdxString: value || "" } : t) };
+      })
+    }
+    else {
+      setArticle((prev) => {
+        if (!prev) return prev; // Ensure the previous state exists
+        return { ...prev, mdxString: value || "" }; // Ensure mdxString is always a string
+      });
+    }
+  };
+
+  const handleTranslatedContentChange: (
+    e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>
+  ) => void = (e) => {
+    const { name, value } = e.target;
+
+    setArticle((prev) => {
+      if (!prev || !currLanguage?.code) return prev; // Ensure state and language exist
+
+      const translationExists = prev.translations.some(t => t.language === currLanguage.code);
+
+      // Update if exists, otherwise add new language
+      const updatedTranslations = translationExists
+        ? prev.translations.map((t) =>
+          t.language === currLanguage.code
+            ? { ...t, [name]: value } as Translations // Ensure type compatibility
+            : t
+        )
+        : [
+          ...prev.translations,
+          {
+            language: currLanguage.code,
+            title: "",
+            description: "",
+            mdxString: "",
+            openGraphTitle: null,
+            openGraphDescription: null,
+            [name]: value,
+          } as Translations, // Ensure type compatibility
+        ];
+
+      return {
+        ...prev,
+        translations: updatedTranslations,
+      };
+    });
+
+    setTranslatedContent((prev) => {
+      if (!prev) return prev;
+      return { ...prev, [name]: name === "mdxString" ? value || "" : value };
+    });
+  };
+
 
   const updateArticle = async () => {
     setLoading(true);
 
+    // check if any of the translations is empty and toast error
+    if (article && article.translations && article.translations.length > 0) {
+      const hasEmptyTranslation = article.translations.some((t) => t.title === "" || t.description === "" || t.mdxString === "");
+      if (hasEmptyTranslation) {
+        setLoading(false);
+        toast.error(`Please fill in all fields for ${currLanguage?.name}`);
+        return;
+      }
+    }
+
     const payload = {
       ...article,
       tags,
-      mdxString: mdxString || "",
     };
 
     const res = await fetch(`/api/article`, {
@@ -109,11 +184,31 @@ const EditArticle = () => {
   };
 
   useEffect(() => {
+    if (article && article.translations && currLanguage && currLanguage.code !== "english" && article.translations.length > 0) {
+      const translations = article.translations.find(t => t.language === currLanguage.code);
+      if (translations) {
+        setTranslatedContent(translations);
+      } else {
+        setTranslatedContent({
+          title: "",
+          description: "",
+          mdxString: "",
+          language: currLanguage?.code || "",
+          openGraphDescription: "",
+          openGraphTitle: ""
+        })
+      }
+    }
+    else {
+      setTranslatedContent(undefined)
+    }
+  }, [currLanguage])
+
+  useEffect(() => {
     const fetchArticles = async () => {
       const res = await fetch(`/api/article?id=${id}`);
       const data = await res.json();
       setArticle(data);
-      setMdxString(data.mdxString);
       setTags(data.tags);
     };
 
@@ -147,13 +242,8 @@ const EditArticle = () => {
     }
   }, [images])
 
-  useEffect(() => {
-    if (article) {
-      const a = { ...article, mdxString: mdxString || "" }
-      setArticle(a)
-    }
-  }, [mdxString])
-
+  console.log(article)
+  console.log(translatedContent)
 
   return (
     <div className="flex">
@@ -217,17 +307,20 @@ const EditArticle = () => {
             <div className="w-full">
               {activeTab === "basic" ? (
                 <BasicEditForm
+                  handleMdxStringChange={handleMdxStringChange}
+                  handleTranslatedContentChange={handleTranslatedContentChange}
                   images={images}
                   setImages={setImages}
                   article={article}
+                  translatedContent={translatedContent}
                   loading={loading}
                   handleChange={handleChange}
-                  setMdxString={setMdxString}
-                  mdxString={mdxString}
                   handleSave={updateArticle}
                 />
               ) : (
                 <SEOEditForm
+                  handleTranslatedContentChange={handleTranslatedContentChange}
+                  translatedContent={translatedContent}
                   article={article}
                   tags={tags}
                   loading={loading}
