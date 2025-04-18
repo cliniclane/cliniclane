@@ -10,7 +10,7 @@ import { MDXRemoteSerializeResult } from "next-mdx-remote";
 import Link from "next/link";
 import ResumeForm from "@/components/ResumeForm";
 import { NextSeo } from "next-seo";
-import { Articles } from "@prisma/client";
+import { Articles, Translations } from "@prisma/client";
 import { GetStaticProps, GetStaticPaths } from "next";
 import { setCookie } from "cookies-next";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
@@ -209,7 +209,7 @@ const Article = ({ articleData, locale }: ArticleProps) => {
 };
 
 
-export const getStaticPaths: GetStaticPaths = async ({ locales }) => {
+export const getStaticPaths: GetStaticPaths = async ({ }) => {
     const url = `${process.env.NEXT_PUBLIC_NEXTAUTH_URL}/api/article/all`;
 
     const res = await fetch(url, {
@@ -223,16 +223,30 @@ export const getStaticPaths: GetStaticPaths = async ({ locales }) => {
 
     const paths: { params: { slug: string }; locale: string }[] = [];
 
-    for (const locale of locales ?? []) {
-        const filteredArticles = articles.filter(
-            (article) => article.slug && article.language === locale
-        );
-
-        filteredArticles.forEach((article) => {
+    for (const article of articles) {
+        // Generate page for default article language
+        if (
+            article.language &&
+            article.slug &&
+            (article.language !== "english" || article.mdxString?.trim() !== "")
+        ) {
             paths.push({
                 params: { slug: article.slug },
-                locale,
+                locale: article.language,
             });
+        }
+
+        // Generate pages for each translation
+        article.translations?.forEach((translation) => {
+            if (
+                translation.language &&
+                translation.mdxString?.trim() !== ""
+            ) {
+                paths.push({
+                    params: { slug: article.slug },
+                    locale: translation.language,
+                });
+            }
         });
     }
 
@@ -249,16 +263,20 @@ export const getStaticProps: GetStaticProps = async ({ params, locale }) => {
         return { notFound: true };
     }
 
-    // const language = languages.find((lang) => lang.code === locale);
-
-    const url = `${process.env.NEXT_PUBLIC_NEXTAUTH_URL}/api/article/${slug}?locale=${locale}`;
+    const url = `${process.env.NEXT_PUBLIC_NEXTAUTH_URL}/api/article/${slug}`;
     const res = await fetch(url);
 
     if (!res.ok) return { notFound: true };
 
     const blog = await res.json();
 
-    if (!blog) return { notFound: true };
+    // Ensure mdxString is available for this locale
+    const isDefaultLocale = blog.language === locale;
+    const mdxContent = isDefaultLocale
+        ? blog.mdxString
+        : blog.translations.find((t: Translations) => t.language === locale)?.mdxString;
+
+    if (!mdxContent?.trim()) return { notFound: true };
 
     return {
         props: {
@@ -266,8 +284,9 @@ export const getStaticProps: GetStaticProps = async ({ params, locale }) => {
             locale,
             ...(await serverSideTranslations(locale, ["common"])),
         },
-        revalidate: 60, // Regenerate every 60 seconds
+        revalidate: 60,
     };
 };
+
 
 export default Article;

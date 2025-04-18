@@ -1,9 +1,9 @@
 // next-i18next.config.js
 module.exports = {
     i18n: {
-        locales: ["english", "german", "french", "urdu"],
+        locales: ["english", "german", "french", "urdu", "indonesian", "bengali", "hindi", "yoruba", "hausa", "igbo"],
         defaultLocale: "english",
-        localeDetection: true,
+        localeDetection: false,
     },
     localePath: "./public/locales",
 };
