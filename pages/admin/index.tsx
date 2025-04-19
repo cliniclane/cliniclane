@@ -16,6 +16,7 @@ type Substitute = {
 type RawArticle = {
   headline: string;
   title: string;
+  blogTitles: string[];
   slug: string;
   language: string;
   datePublished: string;
@@ -117,7 +118,7 @@ export default function Articles() {
   }, [languages, session]);
 
   function generateMarkdown(article: RawArticle): string {
-    const { productDetails } = article;
+    const { productDetails, blogTitles } = article;
     const pd = productDetails;
 
     // Parse the JSON string into objects
@@ -175,70 +176,70 @@ export default function Articles() {
     }
 
     const markdown = `
-  ## PRODUCT DETAILS
-  - **🧪 Salt Composition:** ${pd.saltComposition}
-  - **📦 Storage:** ${pd.storage}
-  - **📋 Prescription Required:** Yes
+  ## ${blogTitles[0]}
+  - **${pd.saltComposition.split(": ")[0]}** ${pd.saltComposition.split(": ")[1]}
+  - **${pd.storage.split(": ")[1]}** ${pd.storage.split(": ")[1]}
+  - **${pd.prescriptionRequired.split(": ")[0]}** ${pd.prescriptionRequired.split(": ")[1]}
   
   ---
   
-  ## 📝 PRODUCT INTRODUCTION
+  ## ${blogTitles[1]}
   ${productDetails.productIntroduction}
 
   ---
   
-  ## 🎯 USES OF ${pd.productName.toUpperCase()}
+  ## ${blogTitles[2]}
   ${uses.map((item, i) => `${i + 1}. ${item}`).join('\n')}
 
   <br />
   
-  ## BENEFITS OF ${pd.productName.toUpperCase()}
+  ## ${blogTitles[3]}
   ${Object.entries(benefits)
         .map(([key, val]) => `### ✅ ${key}\n${val}`)
         .join('\n\n')}
 
   ---
   
-  ## ⚠️ SIDE EFFECTS OF ${pd.productName.toUpperCase()}
+  ## ${blogTitles[4]}
   ${pd.sideEffects}
 
   ${pd.commonSideEffects.map((item, i) => `${i + 1}. ${item}`).join('\n')}
   
   ---
   
-  ## 📥 HOW TO USE ${pd.productName.toUpperCase()}
+  ## ${blogTitles[5]}
   ${pd.howToUse}
 
   ---
 
-  ## ⚙️ HOW IT WORKS
+  ## ${blogTitles[6]}
   ${pd.howItWorks}
 
   ---
 
-  ## 🛡️ SAFETY ADVICE
+  ## ${blogTitles[6]}
 
   <br />
   ${generateMarkdownFromRawObjectString(pd.safetyAdvice)}
 
   ---
   
-  ## ⏱️ WHAT IF YOU FORGET TO TAKE\n
+  ## ${blogTitles[7]}
   ${pd.missedDosage}
 
   ---
   
-  ## 💡 QUICK TIPS
+  ## ${blogTitles[8]}
   ${pd.quickTips.filter(Boolean).map(tip => `- ${tip}`).join('\n')}
   
   ---
 
-  ## ❓ FAQs
+  ## ${blogTitles[9]}
   ${formatFAQMarkdown(pd.faqs)}
 
   ---
 
-  ## Substitutes:
+  ## ${blogTitles[10]}
 
   ${substitutes
         .map((sub, index) => {
