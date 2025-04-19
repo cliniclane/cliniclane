@@ -23,21 +23,21 @@ export default function Navbar() {
 
       {/* Navigation Links */}
       <div className="hidden md:flex space-x-8 text-gray-950">
-        <Link href="/" className="hover:text-gray-500 text-lg">
+        <Link href="/" className="hover:text-gray-500 text-lg capitalize">
           {t("home")}
         </Link>
 
-        <Link href="/contact" className="hover:text-gray-500 text-lg">
+        <Link href="/contact" className="hover:text-gray-500 text-lg capitalize">
           {t("contact")}
         </Link>
 
-        <Link href="/about" className="hover:text-gray-500 text-lg">
+        <Link href="/about" className="hover:text-gray-500 text-lg capitalize">
           {t("about")}
         </Link>
 
         <button
           onClick={scrollToResumeForm}
-          className="hover:text-gray-500 text-lg"
+          className="hover:text-gray-500 capitalize text-lg"
         >
           {t("career")}
         </button>
