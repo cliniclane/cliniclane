@@ -15,6 +15,7 @@ type Substitute = {
 
 type RawArticle = {
   headline: string;
+  title: string;
   slug: string;
   language: string;
   datePublished: string;
@@ -260,7 +261,7 @@ export default function Articles() {
 
     const formatted: IArticles[] = rawData.map((item: RawArticle) => ({
       id: Math.random().toString(36).substring(2, 15),
-      title: item.headline,
+      title: item.title,
       slug: item.slug,
       tags: item.productDetails.commonSideEffects,
       description: item.description || "",
@@ -272,7 +273,7 @@ export default function Articles() {
       mdxString: generateMarkdown(item),
       canonical: item.canonicalUrl || "",
       openGraphImage: "",
-      openGraphTitle: item.headline || "",
+      openGraphTitle: item.title || "",
       openGraphDescription: item.description || "",
     }));
 
@@ -289,7 +290,7 @@ export default function Articles() {
     // Check for empty titles
     const emptyTitles = formatted.filter((item) => !item.title);
     if (emptyTitles.length) {
-      toast.error("Found articles with empty titles. Please ensure all articles have a headline.");
+      toast.error("Found articles with empty titles. Please ensure all articles have a title.");
       return;
     }
 
