@@ -243,7 +243,7 @@ const NewArticle = () => {
           description: "",
           tags: [""],
           mdxString: "",
-
+          canonical: "",
           language: currLanguage?.code || "",
           openGraphDescription: "",
           openGraphTitle: ""

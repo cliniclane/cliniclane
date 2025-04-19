@@ -13,6 +13,11 @@ type Substitute = {
   Manufacturer: string;
 };
 
+type FAQ = {
+  question: string;
+  answer: string;
+};
+
 type RawArticle = {
   headline: string;
   title: string;
@@ -54,7 +59,7 @@ type RawArticle = {
     quickTips: string[];
     factBox: string;
     userFeedback: string;
-    faqs: string;
+    faqs: FAQ[];
     substitutes: Substitute[]; // Can be parsed into object[]
     prescriptionRequired: string;
     uses: string; // stringified arrays
@@ -135,23 +140,14 @@ export default function Articles() {
     const benefits = parseObject(pd.benefits);
     const uses = pd.uses.split(', ');
 
-    function formatFAQMarkdown(faqRaw: string): string {
-      const lines = faqRaw.trim().split('\n');
-      let formattedMarkdown = '';
 
-      for (let i = 0; i < lines.length; i++) {
-        const line = lines[i].trim();
-
-        if (line.startsWith('Q:')) {
-          const question = line.replace(/^Q:\s*/, '');
-          formattedMarkdown += `**Q: ${question}**\n`;
-        } else if (line.startsWith('A:')) {
-          const answer = line.replace(/^A:\s*/, '');
-          formattedMarkdown += `\nA: ${answer}\n\n`;
-        }
-      }
-
-      return formattedMarkdown.trim();
+    function formatFAQMarkdown(faqs: FAQ[]): string {
+      return faqs
+        .map(
+          (faq) =>
+            `#### Q: ${faq.question}\n**A:** ${faq.answer}`
+        )
+        .join("\n\n");
     }
 
     function generateSafetyAdviceMarkdown(safetyAdviceArray: string[]) {

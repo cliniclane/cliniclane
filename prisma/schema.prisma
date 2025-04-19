@@ -24,6 +24,7 @@ type Translations {
   title                String
   tags                 String[]
   language             String
+  canonical            String
   description          String
   openGraphTitle       String?
   openGraphDescription String?

@@ -195,6 +195,7 @@ const EditArticle = () => {
           description: "",
           mdxString: "",
           tags: [""],
+          canonical: "",
           language: currLanguage?.code || "",
           openGraphDescription: "",
           openGraphTitle: ""

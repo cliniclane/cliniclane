@@ -87,7 +87,8 @@ const SEOEditForm: FC<IProps> = ({
           className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
         />
       </div>
-      {renderInputField("canonical", "Canonical", article?.canonical)}
+      {renderInputField("canonical", "Canonical",
+        translatedContent ? translatedContent?.canonical as string : article?.canonical as string)}
       {renderInputField(
         "openGraphImage",
         "Open Graph Image",

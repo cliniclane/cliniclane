@@ -53,6 +53,7 @@ export default async function handler(
           title: article.title,
           mdxString: article.mdxString,
           tags: article.tags,
+          canonical: article.canonical,
           description: article.description,
           language: article.language!,
           openGraphTitle: article.openGraphTitle,
