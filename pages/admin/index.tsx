@@ -165,9 +165,9 @@ export default function Articles() {
     const markdown = `
   ## ${blogTitles[0]}
   <br />
-  - **${pd.saltComposition.split(": ")[0]}** ${pd.saltComposition.split(": ")[1]}
-  - **${pd.storage.split(": ")[1]}** ${pd.storage.split(": ")[1]}
-  - **${pd.prescriptionRequired.split(": ")[0]}** ${pd.prescriptionRequired.split(": ")[1]}
+  - **${pd.saltComposition.split(": ")[0] + ":"}** ${pd.saltComposition.split(": ")[1]}
+  - **${pd.storage.split(": ")[1] + ":"}** ${pd.storage.split(": ")[1]}
+  - **${pd.prescriptionRequired.split(": ")[0] + ":"}** ${pd.prescriptionRequired.split(": ")[1]}
   
   ---
   

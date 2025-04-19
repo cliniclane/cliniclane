@@ -22,6 +22,7 @@ model Users {
 type Translations {
   mdxString            String
   title                String
+  tags                 String[]
   blogTitles           String[]
   language             String
   description          String

@@ -242,6 +242,7 @@ const NewArticle = () => {
         setTranslatedContent({
           title: "",
           description: "",
+          tags: [""],
           mdxString: "",
           blogTitles: [""],
           language: currLanguage?.code || "",

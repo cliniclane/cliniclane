@@ -115,8 +115,10 @@ const Article = ({ articleData, locale }: ArticleProps) => {
                 {/* Header */}
                 <div className="flex flex-col">
                     {/* Title */}
-                    <h1 className="font-bold text-5xl md:w-[80%]">{translatedContent ? translatedContent.title : articleData.title}</h1>
-
+                    <h1 className="font-bold text-5xl leading-snug md:w-[80%]">{translatedContent ? translatedContent.title : articleData.title}</h1>
+                    <p className="text-gray-500 italic text-left mt-2">
+                        {new Date(articleData.publishDate).toDateString()}
+                    </p>
                     <div className="grid md:grid-cols-1 gap-10">
                         {/* Image */}
                         {/* <div className="mt-10">
@@ -147,15 +149,26 @@ const Article = ({ articleData, locale }: ArticleProps) => {
                             </div>
                         </div> */}
                         {/* Tags */}
-                        <div className="flex h-fit flex-wrap mt-5 mb-14">
-                            {articleData.tags.filter(item => item !== "").map((tag, i) => (
-                                <span
-                                    key={i}
-                                    className="inline-block mt-2 bg-gray-200 px-2 py-1 text-sm text-gray-700 rounded-sm mr-2"
-                                >
-                                    {tag}
-                                </span>
-                            ))}
+                        <div className="flex h-fit flex-wrap mt-5 mb-24">
+                            {translatedContent ?
+                                (
+                                    translatedContent?.tags?.filter(item => item !== "").map((tag, i) => (
+                                        <span
+                                            key={i}
+                                            className="inline-block mt-2 bg-gray-200 px-2 py-1 text-sm text-gray-700 rounded-sm mr-2"
+                                        >
+                                            {tag}
+                                        </span>
+                                    ))
+                                )
+                                : articleData.tags.filter(item => item !== "").map((tag, i) => (
+                                    <span
+                                        key={i}
+                                        className="inline-block mt-2 bg-gray-200 px-2 py-1 text-sm text-gray-700 rounded-sm mr-2"
+                                    >
+                                        {tag}
+                                    </span>
+                                ))}
                         </div>
                     </div>
                 </div>
