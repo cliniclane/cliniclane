@@ -145,10 +145,9 @@ export default function Articles() {
       return faqs
         .map(
           (faq) =>
-            `__Q: ${faq.question}__\n\n
-          \n**A:** ${faq.answer}`
+            `**Q: ${faq.question}**\n\n${faq.answer}\n`
         )
-        .join("\n\n");
+        .join('\n');
     }
 
     function generateSafetyAdviceMarkdown(safetyAdviceArray: string[]) {
