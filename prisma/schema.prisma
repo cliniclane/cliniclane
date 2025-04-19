@@ -23,7 +23,6 @@ type Translations {
   mdxString            String
   title                String
   tags                 String[]
-  blogTitles           String[]
   language             String
   description          String
   openGraphTitle       String?
@@ -33,7 +32,6 @@ type Translations {
 model Articles {
   id                   String         @id @map("_id")
   title                String
-  blogTitles           String[]
   slug                 String         @unique
   tags                 String[]
   description          String

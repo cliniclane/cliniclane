@@ -165,19 +165,19 @@ export default function Articles() {
     const markdown = `
   ## ${blogTitles[0]}
   <br />
-  - **${pd.saltComposition.split(": ")[0] + ":"}** ${pd.saltComposition.split(": ")[1]}
-  - **${pd.storage.split(": ")[1] + ":"}** ${pd.storage.split(": ")[1]}
-  - **${pd.prescriptionRequired.split(": ")[0] + ":"}** ${pd.prescriptionRequired.split(": ")[1]}
+  - **${"🧪 " + pd.saltComposition.split(": ")[0] + ":"}** ${pd.saltComposition.split(": ")[1]}
+  - **${"📦  " + pd.storage.split(": ")[1] + ":"}** ${pd.storage.split(": ")[1]}
+  - **${"📋 " + pd.prescriptionRequired.split(": ")[0] + ":"}** ${pd.prescriptionRequired.split(": ")[1]}
   
   ---
   
-  ## ${blogTitles[1]}
+  ## 📝 ${blogTitles[1]}
   <br />
   ${productDetails.productIntroduction}
 
   ---
   
-  ## ${blogTitles[2]}
+  ## 🎯 ${blogTitles[2]}
   <br />
   ${uses.map((item, i) => `${i + 1}. ${item}`).join('\n')}
 
@@ -192,7 +192,7 @@ export default function Articles() {
 
   ---
   
-  ## ${blogTitles[4]}
+  ## ⚠️ ${blogTitles[4]}
   <br />
   ${pd.sideEffects}
 
@@ -200,35 +200,35 @@ export default function Articles() {
   
   ---
   
-  ## ${blogTitles[5]}
+  ## 📥 ${blogTitles[5]}
   ${pd.howToUse}
 
   ---
 
-  ## ${blogTitles[6]}
+  ## ⚙️ ${blogTitles[6]}
   ${pd.howItWorks}
 
   ---
 
-  ## ${blogTitles[7]}
+  ## 🛡️ ${blogTitles[7]}
   <br />
   ${generateSafetyAdviceMarkdown(pd.safetyAdvice)}
 
   ---
   
-  ## ${blogTitles[8]}
+  ## ⏱️ ${blogTitles[8]}
   <br />
   ${pd.missedDosage}
 
   ---
   
-  ## ${blogTitles[9]}
+  ## 💡 ${blogTitles[9]}
   <br />
   ${pd.quickTips.filter(Boolean).map(tip => `- ${tip}`).join('\n')}
 
   ---
 
-  ## ${blogTitles[10]}
+  ## ❓ ${blogTitles[10]}
   <br />
   ${formatFAQMarkdown(pd.faqs)}
 

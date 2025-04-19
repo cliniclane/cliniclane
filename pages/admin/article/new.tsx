@@ -23,7 +23,6 @@ const newArticle = {
   author: "",
   publishDate: "",
   title: "",
-  blogTitles: [""],
   description: "",
   tags: [],
   images: ["", "", ""],
@@ -133,7 +132,7 @@ const NewArticle = () => {
             language: currLanguage.code,
             title: "",
             description: "",
-            blogTitles: [""],
+            tags: [""],
             mdxString: "",
             openGraphTitle: null,
             openGraphDescription: null,
@@ -244,7 +243,7 @@ const NewArticle = () => {
           description: "",
           tags: [""],
           mdxString: "",
-          blogTitles: [""],
+
           language: currLanguage?.code || "",
           openGraphDescription: "",
           openGraphTitle: ""

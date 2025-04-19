@@ -52,7 +52,6 @@ export default async function handler(
         const baseTranslation: Translations = {
           title: article.title,
           mdxString: article.mdxString,
-          blogTitles: article.blogTitles,
           tags: article.tags,
           description: article.description,
           language: article.language!,

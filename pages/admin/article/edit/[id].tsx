@@ -115,7 +115,7 @@ const EditArticle = () => {
             title: "",
             description: "",
             mdxString: "",
-            blogTitles: [""],
+            tags: [""],
             openGraphTitle: null,
             openGraphDescription: null,
             [name]: value,
@@ -195,7 +195,6 @@ const EditArticle = () => {
           description: "",
           mdxString: "",
           tags: [""],
-          blogTitles: [""],
           language: currLanguage?.code || "",
           openGraphDescription: "",
           openGraphTitle: ""
