@@ -163,7 +163,7 @@ export default function Articles() {
 
         if (line.startsWith('Q:')) {
           const question = line.replace(/^Q:\s*/, '');
-          formattedMarkdown += `**Q: ${question}**`;
+          formattedMarkdown += `**Q: ${question}**\n`;
         } else if (line.startsWith('A:')) {
           const answer = line.replace(/^A:\s*/, '');
           formattedMarkdown += `\nA: ${answer}\n\n`;
