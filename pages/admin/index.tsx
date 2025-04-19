@@ -186,26 +186,26 @@ export default function Articles() {
 
   ---
   
-  ## 🎯 USES
+  ## 🎯 USES OF ${pd.productName.toUpperCase()}
   ${uses.map((item, i) => `${i + 1}. ${item}`).join('\n')}
 
   <br />
   
-  ## BENEFITS 
+  ## BENEFITS OF ${pd.productName.toUpperCase()}
   ${Object.entries(benefits)
         .map(([key, val]) => `### ✅ ${key}\n${val}`)
         .join('\n\n')}
 
   ---
   
-  ## ⚠️ SIDE EFFECTS 
+  ## ⚠️ SIDE EFFECTS OF ${pd.productName.toUpperCase()}
   ${pd.sideEffects}
 
   ${pd.commonSideEffects.map((item, i) => `${i + 1}. ${item}`).join('\n')}
   
   ---
   
-  ## 📥 HOW TO USE
+  ## 📥 HOW TO USE ${pd.productName.toUpperCase()}
   ${pd.howToUse}
 
   ---
