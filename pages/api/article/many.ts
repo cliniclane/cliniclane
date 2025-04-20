@@ -8,7 +8,58 @@ export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse
 ) {
-  if (req.method === "POST") {
+  if (req.method === "GET") {
+    const { language } = req.query;
+
+    if (!language || typeof language !== "string") {
+      return res
+        .status(400)
+        .json({ message: "Language query param is required" });
+    }
+
+    try {
+      const articles = await prisma.articles.findMany({
+        where: {
+          OR: [
+            { language: language.toLowerCase() }, // primary language match
+            { translations: { some: { language: language.toLowerCase() } } }, // translated match
+          ],
+        },
+        select: {
+          id: true,
+          title: true,
+          slug: true,
+          tags: true,
+          description: true,
+          author: true,
+          language: true,
+          languages: true,
+          headerImage: true,
+          images: true,
+          publishDate: true,
+          mdxString: true,
+          canonical: true,
+          openGraphImage: true,
+          openGraphTitle: true,
+          openGraphDescription: true,
+          translations: true,
+        },
+      });
+
+      const filteredArticles = articles.map((article) => ({
+        ...article,
+        translations: article.translations.filter(
+          (translation) =>
+            translation.language.toLowerCase() === language.toLowerCase()
+        ),
+      }));
+
+      res.status(200).json(filteredArticles);
+    } catch (error) {
+      console.error("Error fetching articles:", error);
+      res.status(500).json({ message: "Internal Server Error" });
+    }
+  } else if (req.method === "POST") {
     const { articles, email } = req.body;
     console.log(articles);
 
