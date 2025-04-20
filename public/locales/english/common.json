@@ -47,5 +47,8 @@
     "emailPlaceholder": "Email Address*",
     "newsletterTitlePart1": "Join our",
     "newsletterTitleHighlight": "30 days",
-    "newsletterTitlePart2": "detox program"
+    "newsletterTitlePart2": "detox program",
+    "main": "Main",
+    "pri": "Privacy",
+    "articles": "Articles"
 }

@@ -8,35 +8,8 @@ import Link from "next/link";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 import { useTranslation } from "next-i18next";
 import { useEffect, useState } from "react";
+import { filterArticlesByLanguage } from "@/lib/utils";
 
-
-export function filterArticlesByLanguage(articles: Articles[], language: string): Articles[] {
-  const lowerLang = language.toLowerCase();
-
-  return articles.map((article) => {
-    if (article.language?.toLowerCase() === lowerLang || lowerLang === 'english') {
-      return article; // Return as-is for primary language or English
-    }
-
-    const translated = article.translations.find(
-      (t) => t.language.toLowerCase() === lowerLang
-    );
-
-    if (!translated) return article; // No translation found, return original
-
-    return {
-      ...article,
-      title: translated.title,
-      tags: translated.tags,
-      mdxString: translated.mdxString,
-      language: translated.language,
-      canonical: translated.canonical ?? article.canonical,
-      description: translated.description,
-      openGraphTitle: translated.openGraphTitle ?? article.openGraphTitle,
-      openGraphDescription: translated.openGraphDescription ?? article.openGraphDescription,
-    };
-  });
-}
 
 export default function Home({ articles, locale }: { articles: Articles[], locale: string }) {
 
