@@ -234,7 +234,7 @@ export default function Articles() {
   <br />
   ${substitutes
         .map((sub, index) => {
-          return `${index + 1}. [**${sub.Name}**](${sub.URL})  _Manufacturer: ${sub.Manufacturer}_\n`;
+          return `${index + 1}. [**${sub.Name}**](${sub.URL})  _${sub.Manufacturer}_\n`;
         })
         .join("\n")
       }
