@@ -145,7 +145,7 @@ export default function Articles() {
       return faqs
         .map(
           (faq) =>
-            `**${faq.question}**\n\n **A:** ${faq.answer}\n`
+            `**${faq.question}**\n\n **${faq.answer.split(":")[0]}** ${faq.answer.split(": ")[1]}\n`
         )
         .join('\n');
     }
