@@ -58,8 +58,7 @@ const ContactForm = () => {
         <div className="w-full md:max-w-xs shadow border bg-gray-100 rounded-lg p-4 pb-6 md:fixed right-[2vw] bottom-10 xl:right-[5vw]">
             <form ref={form} onSubmit={sendEmail} className="">
                 <p className='text-xl font-bold text-gray-900 mb-5 text-center'>
-                    Fill Out The Form To Receive
-                    Your Offer Today!
+                    Do you wanna talk to consult?
                 </p>
                 <div className="mb-5">
                     <input
