@@ -14,6 +14,7 @@ import { Articles, Translations } from "@prisma/client";
 import { GetStaticProps, GetStaticPaths } from "next";
 import { setCookie } from "cookies-next";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
+import ContactForm from "@/components/ContactForm";
 
 
 interface ArticleProps {
@@ -198,6 +199,7 @@ const Article = ({ articleData, locale }: ArticleProps) => {
                         </ul>
                     </div>
                 </div>
+                <ContactForm />
             </main>
             {/*
        * Form
