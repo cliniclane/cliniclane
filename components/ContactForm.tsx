@@ -1,4 +1,4 @@
-import React, { FormEvent, useRef, useState } from 'react'
+import React, { FormEvent, useEffect, useRef, useState } from 'react'
 import emailjs from "@emailjs/browser";
 import toast from "react-hot-toast";
 import { useRouter } from 'next/router';
@@ -16,7 +16,6 @@ const ContactForm = () => {
         message: "",
         pathname: ""
     });
-
 
     const sendEmail = (e: FormEvent<HTMLFormElement>) => {
         e.preventDefault();
@@ -53,9 +52,25 @@ const ContactForm = () => {
             );
     };
 
+    const [isFixed, setIsFixed] = useState(true);
+    const triggerHeight = 4500; // Adjust this scroll value
+
+    useEffect(() => {
+        const handleScroll = () => {
+            setIsFixed(window.scrollY < triggerHeight);
+        };
+
+        window.addEventListener('scroll', handleScroll);
+        return () => window.removeEventListener('scroll', handleScroll);
+    }, []);
 
     return (
-        <div className="w-full md:max-w-xs shadow border bg-gray-100 rounded-lg p-4 pb-6 md:fixed right-[2vw] bottom-10 xl:right-[5vw]">
+        <div
+            className={`w-full md:max-w-xs shadow border bg-gray-100 rounded-lg p-3 pb-6 ${isFixed
+                    ? "fixed right-[2vw] bottom-14 xl:right-[5vw]"
+                    : "absolute right-[2vw] top-[4500px] xl:right-[5vw]"
+                }`}
+        >
             <form ref={form} onSubmit={sendEmail} className="">
                 <p className='text-xl font-bold text-gray-900 mb-5 text-center'>
                     Do you wanna talk to consult?
