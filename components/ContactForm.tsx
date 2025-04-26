@@ -53,7 +53,7 @@ const ContactForm = () => {
     };
 
     const [isFixed, setIsFixed] = useState(true);
-    const triggerHeight = 4500; // Adjust this scroll value
+    const triggerHeight = 4200; // Adjust this scroll value
 
     useEffect(() => {
         const handleScroll = () => {
@@ -67,8 +67,8 @@ const ContactForm = () => {
     return (
         <div
             className={`w-full md:max-w-xs shadow border bg-gray-100 rounded-lg p-3 pb-6 ${isFixed
-                    ? "fixed right-[2vw] bottom-14 xl:right-[5vw]"
-                    : "absolute right-[2vw] top-[4500px] xl:right-[5vw]"
+                ? "md:fixed right-[2vw] top-40 xl:right-[5vw]"
+                : "md:absolute right-[2vw] top-[4200px] xl:right-[5vw]"
                 }`}
         >
             <form ref={form} onSubmit={sendEmail} className="">
