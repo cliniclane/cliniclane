@@ -199,16 +199,19 @@ export default function ArticleTable({
     data,
     extractedData,
     selectedArticles,
+    setSelectedArticles,
     handleCheckboxChange,
     setExtractedData,
     setData,
     handleOnFileChange,
     languages,
     selectedImportLanguage,
-    setSelectedImportLanguage
+    setSelectedImportLanguage,
+    duplicateSlugGroups,
 }: {
     data: Articles[]
     selectedArticles: Articles[]
+    setSelectedArticles: React.Dispatch<React.SetStateAction<Articles[]>>
     extractedData: Articles[] | null
     setExtractedData: React.Dispatch<React.SetStateAction<Articles[] | null>>
     setData: React.Dispatch<React.SetStateAction<Articles[] | null | undefined>>
@@ -217,7 +220,8 @@ export default function ArticleTable({
     selectedImportLanguage?: Languages | null
     languages?: Languages[] | null
     setSelectedImportLanguage: React.Dispatch<React.SetStateAction<Languages | null>>
-
+    duplicateSlugGroups: Articles[][]
+    setDuplicateSlugGroups: React.Dispatch<React.SetStateAction<Articles[][]>>
 }) {
     const [sorting, setSorting] = React.useState<SortingState>([])
     const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>(
@@ -231,7 +235,7 @@ export default function ArticleTable({
     const [isImportModalOpen, setIsImportModalOpen] = React.useState(false);
     const [selectedRow, setSelectedRow] = React.useState<Articles | null>(null);
     const { data: session } = useSession()
-
+    const [isDuplicateOpen, setIsDuplicateOpen] = React.useState(false);
 
 
     // Sabe extracted data to database
@@ -348,6 +352,16 @@ export default function ArticleTable({
     };
 
 
+    // Remove the checked articles from the extracted data
+    const handleDuplicateCheckboxChange = (article: Articles) => {
+        if (selectedArticles.includes(article)) {
+            setSelectedArticles(selectedArticles.filter((a) => a.id !== article.id));
+        } else {
+            setSelectedArticles([...selectedArticles, article]);
+        }
+    }
+
+
     // Delete Article
     const deleteArticle = async (id: string) => {
         if (!data) return;
@@ -459,6 +473,8 @@ export default function ArticleTable({
                         </AlertDialogFooter>
                     </AlertDialogContent>
                 </AlertDialog>
+
+                {/* Import Articles */}
                 <AlertDialog open={isImportModalOpen} onOpenChange={(open) => {
                     if (open) {
                         setIsImportModalOpen(true)
@@ -469,16 +485,14 @@ export default function ArticleTable({
                     }
                 }
                 } >
-                    <AlertDialogContent>
+                    {!isDuplicateOpen ? <AlertDialogContent className="w-full max-w-2xl">
                         <AlertDialogHeader>
                             <AlertDialogTitle>
                                 Import Articles from JSON File
                             </AlertDialogTitle>
-                            <AlertDialogDescription>
+                            <AlertDialogDescription className="overflow-y-auto h-96 flex flex-col">
                                 <span>
                                     Select a JSON file to import your articles.
-                                </span>
-                                <span>
                                     Only JSON files with a `.json` extension are
                                     accepted.
                                 </span>
@@ -491,8 +505,21 @@ export default function ArticleTable({
                                     className="my-6 h-12"
                                 />
 
+                                {
+                                    selectedArticles.map((article) => article.slug).filter((slug, index, self) => self.indexOf(slug) !== index).length > 0 &&
+                                    <span className="text-red-500 font-medium mt-0">
+                                        {/* check the number of duplicate slugs from selectedArticles */}
+                                        {selectedArticles.map((article) => article.slug).filter((slug, index, self) => self.indexOf(slug) !== index).length} duplicate slugs found in the selected articles.
+                                        Please resolve them before proceeding.
+                                    </span>
+                                }
+
+                                <span onClick={() => setIsDuplicateOpen(true)} className={`mt-2 underline ${duplicateSlugGroups.length > 0 ? "text-red-500" : "text-gray-500"} font-medium cursor-pointer`}>
+                                    {selectedArticles.map((article) => article.slug).filter((slug, index, self) => self.indexOf(slug) !== index).length > 0 && "View Duplicate Slugs"}
+                                </span>
+
                                 {extractedData && (
-                                    <ul className="space-y-1 mb-5">
+                                    <ul className="space-y-1 my-5">
                                         {extractedData.map((article, index) => (
                                             <li key={index} className="capitalize flex items-center gap-2 text-black">
                                                 <input
@@ -536,7 +563,7 @@ export default function ArticleTable({
                         <AlertDialogFooter>
                             <AlertDialogCancel>Cancel</AlertDialogCancel>
                             <Button
-                                disabled={!extractedData}
+                                disabled={!extractedData || selectedArticles.map((article) => article.slug).filter((slug, index, self) => self.indexOf(slug) !== index).length > 0 || isLoading}
                                 onClick={(e) => {
                                     e.preventDefault();
                                     handleSaveExtractedData();
@@ -546,8 +573,74 @@ export default function ArticleTable({
                                 Continue
                             </Button>
                         </AlertDialogFooter>
-                    </AlertDialogContent>
+                    </AlertDialogContent> :
+                        (<AlertDialogContent className="w-full max-w-2xl">
+                            <AlertDialogHeader>
+                                <AlertDialogTitle>
+                                    { selectedArticles.map((article) => article.slug).filter((slug, index, self) => self.indexOf(slug) !== index).length} Duplicate Slugs Found
+                                </AlertDialogTitle>
+                                <AlertDialogDescription className="overflow-y-auto h-96">
+                                    {duplicateSlugGroups && (
+                                        <ul className="space-y-2 mb-5">
+                                            {duplicateSlugGroups.map((article, index) => (
+                                                <li key={index} className="capitalize flex flex-col border p-2 rounded-lg gap-2 text-black">
+                                                    {article.map((a, i) => (
+                                                        <div key={i} className="flex items-center gap-2">
+                                                            <input
+                                                                type="checkbox"
+                                                                className="text-black"
+                                                                checked={selectedArticles?.includes(a) || false}
+                                                                onChange={() => {
+                                                                    handleDuplicateCheckboxChange(a)
+                                                                }}
+                                                            />
+                                                            <span>({a.id}) {a.slug} </span>
+                                                        </div>
+                                                    ))}
+                                                </li>
+                                            ))}
+                                        </ul>
+                                    )}
+
+                                    <div className="w-full flex justify-between my-5">
+                                        <span className="text-gray-500 mt-5">
+                                            Selected: {selectedArticles.length} of {extractedData?.length}
+                                        </span>
+                                        <DropdownMenu>
+                                            <DropdownMenuTrigger asChild>
+                                                <Button variant="outline" className="flex items-center space-x-2">
+                                                    <Globe className="w-4 h-4 mr-2" />
+                                                    <span className="capitalize">{selectedImportLanguage?.name || "English"}</span>
+                                                </Button>
+                                            </DropdownMenuTrigger>
+                                            <DropdownMenuContent align="end">
+                                                {languages?.map((loc) => (
+                                                    <DropdownMenuItem
+                                                        key={loc.id}
+                                                        onClick={() => setSelectedImportLanguage(loc)}
+                                                        className="capitalize"
+                                                    >
+                                                        {loc.name}
+                                                    </DropdownMenuItem>
+                                                ))}
+                                            </DropdownMenuContent>
+                                        </DropdownMenu>
+                                    </div>
+                                </AlertDialogDescription>
+                            </AlertDialogHeader>
+                            <AlertDialogFooter>
+                                <Button
+                                    onClick={() => {
+                                        setIsDuplicateOpen(false)
+                                    }}
+                                >
+                                    Done
+                                </Button>
+                            </AlertDialogFooter>
+                        </AlertDialogContent>)
+                    }
                 </AlertDialog>
+
                 <Input
                     placeholder="Filter Slug..."
                     value={(table.getColumn("slug")?.getFilterValue() as string) ?? ""}
