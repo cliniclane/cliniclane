@@ -518,6 +518,10 @@ export default function ArticleTable({
                                     {selectedArticles.map((article) => article.slug).filter((slug, index, self) => self.indexOf(slug) !== index).length > 0 && "View Duplicate Slugs"}
                                 </span>
 
+                                <span>
+                                    <strong>{selectedArticles.length}</strong> selected out of <strong>{extractedData?.length || 0}</strong> articles
+                                </span>
+
                                 {extractedData && (
                                     <ul className="space-y-1 my-5">
                                         {extractedData.map((article, index) => (
@@ -578,8 +582,26 @@ export default function ArticleTable({
                             <AlertDialogHeader>
                                 <AlertDialogTitle>
                                     {selectedArticles.map((article) => article.slug).filter((slug, index, self) => self.indexOf(slug) !== index).length} Duplicate Slugs Found
-                                    <div className="my-3 flex items-center justify-between">
-                                        <button className="text-blue-500 underline"
+                                    <div className="my-3 flex items-center space-x-3">
+                                        <button className="text-sm shadow-sm border rounded-lg px-3 py-1 disabled:bg-gray-200 disabled:text-gray-500"
+                                            disabled={selectedArticles.length === 0 || duplicateSlugGroups.length === 0}
+                                            onClick={() => {
+                                                // only keep one of the arricles with the same slug
+                                                const uniqueSlugs = new Set();
+                                                const uniqueArticles = selectedArticles.filter((article) => {
+                                                    if (uniqueSlugs.has(article.slug)) {
+                                                        return false; // already seen this slug
+                                                    } else {
+                                                        uniqueSlugs.add(article.slug);
+                                                        return true; // keep this article
+                                                    }
+                                                });
+                                                setSelectedArticles(uniqueArticles);
+                                            }
+                                            }>
+                                            Uncheck all duplicates
+                                        </button>
+                                        <button className="text-sm shadow-sm border rounded-lg px-3 py-1"
                                             onClick={() => {
                                                 // check all the duplicate articles
                                                 const allDuplicateArticles = duplicateSlugGroups.flat();
@@ -591,7 +613,7 @@ export default function ArticleTable({
                                             }>
                                             Check all
                                         </button>
-                                        <button className="text-gray-500 underline"
+                                        <button className="text-sm shadow-sm border rounded-lg px-3 py-1"
                                             onClick={() => {
                                                 // uncheck all the duplicate articles
                                                 const allDuplicateArticles = duplicateSlugGroups.flat();
