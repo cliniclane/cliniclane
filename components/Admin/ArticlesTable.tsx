@@ -577,7 +577,31 @@ export default function ArticleTable({
                         (<AlertDialogContent className="w-full max-w-2xl">
                             <AlertDialogHeader>
                                 <AlertDialogTitle>
-                                    { selectedArticles.map((article) => article.slug).filter((slug, index, self) => self.indexOf(slug) !== index).length} Duplicate Slugs Found
+                                    {selectedArticles.map((article) => article.slug).filter((slug, index, self) => self.indexOf(slug) !== index).length} Duplicate Slugs Found
+                                    <div className="my-3 flex items-center justify-between">
+                                        <button className="text-blue-500 underline"
+                                            onClick={() => {
+                                                // check all the duplicate articles
+                                                const allDuplicateArticles = duplicateSlugGroups.flat();
+                                                setSelectedArticles([
+                                                    ...selectedArticles,
+                                                    ...allDuplicateArticles
+                                                ]);
+                                            }
+                                            }>
+                                            Check all
+                                        </button>
+                                        <button className="text-gray-500 underline"
+                                            onClick={() => {
+                                                // uncheck all the duplicate articles
+                                                const allDuplicateArticles = duplicateSlugGroups.flat();
+                                                setSelectedArticles(
+                                                    selectedArticles.filter((a) => !allDuplicateArticles.includes(a))
+                                                );
+                                            }}>
+                                            Uncheck all
+                                        </button>
+                                    </div>
                                 </AlertDialogTitle>
                                 <AlertDialogDescription className="overflow-y-auto h-96">
                                     {duplicateSlugGroups && (
