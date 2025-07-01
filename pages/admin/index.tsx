@@ -80,6 +80,7 @@ export default function Articles() {
   const [selectedArticles, setSelectedArticles] = useState<IArticles[]>([]);
   const [languages, setLanguages] = useState<Languages[] | null>(null);
   const [selectedImportLanguage, setSelectedImportLanguage] = useState<Languages | null>(null);
+  const [duplicateSlugGroups, setDuplicateSlugGroups] = useState<IArticles[][]>([]);
 
   const handleCheckboxChange = (article: IArticles) => {
     setSelectedArticles(
@@ -269,16 +270,6 @@ export default function Articles() {
       openGraphDescription: item.description || "",
     }));
 
-    // Check for duplicates
-    const duplicateSlugs = formatted.map((item) => item.slug);
-
-    const uniqueSlugs = new Set(duplicateSlugs);
-    const hasDuplicates = duplicateSlugs.length !== uniqueSlugs.size;
-    if (hasDuplicates) {
-      toast.error("Duplicate slugs found in the imported articles.");
-      return;
-    }
-
     // Check for empty titles
     const emptyTitles = formatted.filter((item) => !item.title);
     if (emptyTitles.length) {
@@ -291,10 +282,29 @@ export default function Articles() {
       languages?.find((language) => language.code === formatted[0].language) || null
     )
 
+    const duplicateSlugs: string[] = [];
+    const slugMap: Record<string, IArticles[]> = {};
+
+    formatted.forEach((article) => {
+      if (!slugMap[article.slug]) {
+        slugMap[article.slug] = [];
+      }
+      slugMap[article.slug].push(article);
+    });
+
+    const duplicateSlugGroups: IArticles[][] = Object.values(slugMap).filter(group => group.length > 1);
+
+    duplicateSlugGroups.forEach(group => {
+      duplicateSlugs.push(...group.map(article => article.slug));
+    });
+
+    setDuplicateSlugGroups(duplicateSlugGroups);
+
     setExtractedData(formatted);
     setSelectedArticles(formatted)
 
   };
+
 
   // Fetch articles
   useEffect(() => {
@@ -327,10 +337,13 @@ export default function Articles() {
 
         {/* Responsive Table */}
         {articles && <ArticleTable
+          setDuplicateSlugGroups={setDuplicateSlugGroups}
+          duplicateSlugGroups={duplicateSlugGroups}
           selectedImportLanguage={selectedImportLanguage}
           setSelectedImportLanguage={setSelectedImportLanguage}
           languages={languages}
           selectedArticles={selectedArticles}
+          setSelectedArticles={setSelectedArticles}
           handleCheckboxChange={handleCheckboxChange}
           setExtractedData={setExtractedData} extractedData={extractedData} handleOnFileChange={handleFileChange} data={articles} setData={setArticles} />}
       </div>

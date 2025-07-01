@@ -1,6 +1,6 @@
 import Footer from "@/components/Footer";
 import Navbar from "@/components/Navbar";
-import { Articles } from "@prisma/client";
+import { Articles, PrismaClient } from "@prisma/client";
 import Image from "next/image";
 import { useRouter } from "next/router";
 import React from "react";
@@ -20,7 +20,7 @@ const ReadAll = ({ articles }: { articles: Articles[] }) => {
        */}
             <main className="flex flex-col md:px-6 xl:px-14">
                 <div className="grid grid-cols-1 my-6 gap-5 sm:grid-cols-1 md:grid-cols-2">
-                    {articles.slice(0, 40).map((article) => (
+                    {articles.map((article) => (
                         <div
                             onClick={() => router.push(`/[slug]`, `/${article.slug}`)}
                             key={article.id}
@@ -53,17 +53,12 @@ const ReadAll = ({ articles }: { articles: Articles[] }) => {
 };
 
 export const getStaticProps = async ({ locale }: { locale: string }) => {
+    const prisma = new PrismaClient();
 
-    const res = await fetch(
-        process.env.NEXT_PUBLIC_NEXTAUTH_URL + "/api/article/all",
-        {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json",
-            },
-        }
-    );
-    const articles = await res.json();
+    const articles = await prisma.articles.findMany({
+        orderBy: { publishDate: "desc" },
+        take: 40
+    });
 
     return {
         props: {

@@ -131,6 +131,7 @@ export const getStaticProps = async ({ locale }: { locale: string }) => {
 
   const articles = await prisma.articles.findMany({
     orderBy: { publishDate: "desc" },
+    take: 20
   });
 
   if (!articles) {

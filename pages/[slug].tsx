@@ -14,6 +14,7 @@ import { Articles, Translations } from "@prisma/client";
 import { GetStaticProps, GetStaticPaths } from "next";
 import { setCookie } from "cookies-next";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
+import ContactForm from "@/components/ContactForm";
 
 
 interface ArticleProps {
@@ -119,36 +120,8 @@ const Article = ({ articleData, locale }: ArticleProps) => {
                     <p className="text-gray-500 italic text-left mt-2">
                         {new Date(articleData.publishDate).toDateString()}
                     </p>
-                    <div className="grid md:grid-cols-1 gap-10">
-                        {/* Image */}
-                        {/* <div className="mt-10">
-                            <div className="grid grid-cols-3 grid-rows-2 gap-3">
-                                <div className="col-span-3">
-                                    <Image
-                                        src={currImage} // Change to actual image path
-                                        alt="Blog Header"
-                                        width={500} // Fixed width
-                                        height={400} // Fixed height
-                                        className="w-full h-[300px] object-cover rounded-lg"
-                                    />
-                                </div>
-                                {articleData?.images && articleData?.images?.map((image, i) => (
-                                    <div key={i} onClick={() => setCurrImage(image)}
-                                        className={`${currImage === image ? "border p-1 h-fit rounded-lg" : ""}`}
-                                    >
-                                        <Image
-                                            src={image} // Change to actual image path
-                                            alt="Blog Header"
-                                            width={200} // Fixed width
-                                            height={100} // Fixed height
-                                            className="w-full h-[100px] object-cover rounded-lg"
-                                        />
-                                    </div>
-                                ))
-                                }
-                            </div>
-                        </div> */}
-                        {/* Tags */}
+                    {/* Tags */}
+                    <div className="grid md:grid-cols-1 gap-10 md:w-[70%]">
                         <div className="flex h-fit flex-wrap mt-5 mb-24">
                             {translatedContent ?
                                 (
@@ -198,6 +171,7 @@ const Article = ({ articleData, locale }: ArticleProps) => {
                         </ul>
                     </div>
                 </div>
+                <ContactForm />
             </main>
             {/*
        * Form
