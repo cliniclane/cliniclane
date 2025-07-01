@@ -61,7 +61,6 @@ export default async function handler(
     }
   } else if (req.method === "POST") {
     const { articles, email } = req.body;
-    console.log(articles);
 
     if (!articles) {
       return res.status(400).json({ error: "No articles provided" });
@@ -130,15 +129,26 @@ export default async function handler(
         },
         select: { slug: true },
       });
+
+
+      if (existingSlugs.length > 0) {
+        console.log("Existing slugs:", existingSlugs);
+        const existingSlugsArray = existingSlugs.map((a) => a.slug);
+        res.status(400).json({ error: "duplicate-slug", data: existingSlugsArray });
+        return;
+      }
+
       const existingSlugSet = new Set(existingSlugs.map((a) => a.slug));
       const newEnglishArticles = englishArticles.filter(
         (a) => !existingSlugSet.has(a.slug)
       );
 
+
       if (newEnglishArticles.length > 0) {
-        await prisma.articles.createMany({
+        const c = await prisma.articles.createMany({
           data: newEnglishArticles,
         });
+        console.log("New English articles inserted:", c);
       }
 
       // Step 2: Fetch existing base articles for translations
@@ -225,6 +235,8 @@ export default async function handler(
         },
       });
 
+      console.log("Created articles:", createdArticles);
+
       if (!createdArticles.length) {
         return res.status(404).json({ error: "No articles were created" });
       }
@@ -266,3 +278,9 @@ export default async function handler(
     res.status(405).json({ error: "Method not allowed" });
   }
 }
+
+export const config = {
+  api: {
+    responseLimit: false,
+  },
+};

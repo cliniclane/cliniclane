@@ -236,7 +236,7 @@ export default function ArticleTable({
     const [selectedRow, setSelectedRow] = React.useState<Articles | null>(null);
     const { data: session } = useSession()
     const [isDuplicateOpen, setIsDuplicateOpen] = React.useState(false);
-
+    const [duplicateSlugList, setDuplicateSlugList] = React.useState<string[]>([]);
 
     // Sabe extracted data to database
     const handleSaveExtractedData = async () => {
@@ -278,10 +278,16 @@ export default function ArticleTable({
                 });
 
                 setData(updatedData);
+                setIsImportModalOpen(false);
+                setExtractedData(null);
                 toast.success("Articles imported successfully");
             }
             else {
-                toast.error("Failed to import articles");
+                const d = await res.json();
+                if (d.error === "duplicate-slug") {
+                    setDuplicateSlugList(d.data);
+                    toast.error("Slug already exist");
+                }
             }
         } catch (error) {
             console.error(error);
@@ -289,8 +295,6 @@ export default function ArticleTable({
         }
         finally {
             setIsLoading(false);
-            setExtractedData(null);
-            setIsImportModalOpen(false);
         }
     }
 
@@ -475,16 +479,18 @@ export default function ArticleTable({
                 </AlertDialog>
 
                 {/* Import Articles */}
-                <AlertDialog open={isImportModalOpen} onOpenChange={(open) => {
-                    if (open) {
-                        setIsImportModalOpen(true)
+                <AlertDialog
+                    open={isImportModalOpen} onOpenChange={(open) => {
+                        if (open) {
+                            setIsImportModalOpen(true)
+                        }
+                        else {
+                            setIsImportModalOpen(false)
+                            setExtractedData(null)
+                            setDuplicateSlugList([])
+                        }
                     }
-                    else {
-                        setIsImportModalOpen(false)
-                        setExtractedData(null)
-                    }
-                }
-                } >
+                    } >
                     {!isDuplicateOpen ? <AlertDialogContent className="w-full max-w-2xl">
                         <AlertDialogHeader>
                             <AlertDialogTitle>
@@ -532,7 +538,7 @@ export default function ArticleTable({
                                                     checked={selectedArticles.includes(article)}
                                                     onChange={() => handleCheckboxChange(article)}
                                                 />
-                                                <span>{index + 1}. {article.title}</span>
+                                                <span className={duplicateSlugList.includes(article.slug) ? "text-red-500" : ""}>{index + 1}. {article.title}</span>
                                             </li>
                                         ))}
                                     </ul>
