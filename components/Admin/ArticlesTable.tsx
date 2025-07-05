@@ -447,6 +447,7 @@ export default function ArticleTable({
         },
     })
 
+
     return (
         <div className="w-full">
             <div className="grid lg:grid-cols-6 gap-2 items-center py-4">
@@ -527,6 +528,23 @@ export default function ArticleTable({
                                 <span>
                                     <strong>{selectedArticles.length}</strong> selected out of <strong>{extractedData?.length || 0}</strong> articles
                                 </span>
+
+                                {/* Check and uncheck all duplicate slugs radio button */}
+                                {duplicateSlugList.length > 0 &&
+                                    <div className="flex items-center mt-4">
+                                        <Button
+                                            className="text-black text-sm"
+                                            variant="outline"
+                                            onClick={() => {
+                                                setSelectedArticles(selectedArticles.filter((article) => !duplicateSlugList.includes(article.slug)))
+                                            }}
+                                        >
+
+                                            <span>Uncheck all duplicate slugs</span>
+                                        </Button>
+                                    </div>
+
+                                }
 
                                 {extractedData && (
                                     <ul className="space-y-1 my-5">
